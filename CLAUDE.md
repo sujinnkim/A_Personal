@@ -10,8 +10,8 @@
 
 | 에이전트 | 역할 | 담당 경로 |
 |---------|------|---------|
-| `architecture-designer` | 아키텍처 설계 문서 작성 | `docs/01~04장` |
-| `prototype-developer` | Java/Spring Boot 프로토타입 구현 및 검증 | `src/`, `docs/05장` |
+| `architecture-designer` | 아키텍처 설계 문서 작성 | `docs/01-plan` ~ `docs/05-architecture-design` |
+| `prototype-developer` | Java/Spring Boot 프로토타입 구현 및 검증 | `src/`, `docs/06-verification` |
 | `report-writer` | 최종 레포트(.docx) 생성 | `scripts/`, `report/` |
 
 ---
@@ -26,12 +26,19 @@ A_Personal/
 │       ├── prototype-developer.md
 │       └── report-writer.md
 ├── docs/
-│   ├── 01_시스템개요/
-│   ├── 02_요구사항정의/
-│   ├── 03_아키텍처문제분석/
-│   ├── 04_아키텍처상세설계/
-│   ├── 05_아키텍처구현검증/
-│   └── diagrams/
+│   ├── 01-plan/
+│   ├── 02-system-overview/
+│   │   └── 1.2-issues/
+│   ├── 03-requirements/
+│   │   ├── 2.1-functional/
+│   │   └── 2.2-quality/
+│   ├── 04-architecture-analysis/
+│   │   └── 3.2-problem-analysis-and-strategy/
+│   ├── 05-architecture-design/
+│   │   ├── 4.1-conceptual/
+│   │   ├── 4.2-execution/
+│   │   └── 4.3-evaluation/
+│   └── 06-verification/
 ├── material/              # 과제 주요 참고 자료
 ├── memo/                  # 사용자 개인 메모 — 에이전트 참조 금지
 ├── src/
