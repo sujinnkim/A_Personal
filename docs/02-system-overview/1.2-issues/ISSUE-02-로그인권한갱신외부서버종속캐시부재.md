@@ -1,14 +1,14 @@
-# ISSUE-02. 권한 갱신 구조의 외부 서버 종속 지연과 캐시 부재
+# ISSUE-02. 로그인 시 권한 갱신 외부 서버 종속과 서버사이드 캐시 부재
 
 ## 현황
 
-로그인(`POST /sign-in`) 완료 후 클라이언트는 자동으로 회원 정보 조회 API(`GET /members/{email}`)를 호출한다. 이 API는 AC서버, Copilot Admin 서버(LLM 권한), Copilot Admin 서버(용어사전 권한) 등 다수의 외부 서버에 비동기 병렬 호출을 수행하고, `CompletableFuture.allOf()`로 모든 응답이 수신된 후 결과를 반환한다.
+로그인(`POST /sign-in`) 완료 후 클라이언트는 자동으로 회원 정보 조회 API(`GET /members/{email}`)를 호출한다. 이 API는 AC서버(AC 회의 권한 갱신), Copilot Admin 서버(LLM 권한), Copilot Admin 서버(용어사전 권한) 등 다수의 외부 서버에 비동기 병렬 호출을 수행하고, `CompletableFuture.allOf()`로 모든 응답이 수신된 후 결과를 반환한다.
 
 ```
 POST /sign-in → 액세스 토큰 발급
   ↓ (클라이언트 자동 호출)
 GET /members/{email}
-  ├── [비동기 병렬] AC서버       → AC 권한 갱신 및 조회
+  ├── [비동기 병렬] AC서버       → AC 권한 갱신 및 조회  (AC 회의 개설·입장에 필요)
   ├── [비동기 병렬] Copilot 서버 → LLM 권한 갱신 및 조회
   ├── [비동기 병렬] Copilot 서버 → 용어사전 권한 갱신 및 조회
   └── [이후 추가될 외부 호출들...]
@@ -16,7 +16,7 @@ GET /members/{email}
   CompletableFuture.allOf() 대기 → 응답 반환
 ```
 
-권한 데이터(detail, sdc)는 회사 계약 및 관리자 설정 기반으로 변경 빈도가 낮음에도, 서버사이드 캐시 없이 매 로그인마다 외부 서버에 갱신을 요청하는 구조다.
+AC 권한은 로그인 시 AC 서버를 호출하여 확인한 뒤 DB에 저장되며, WC/VC 권한(SDC)은 DB 조회로 확인된다. 그러나 AC·LLM·용어사전 권한은 회사 계약 및 관리자 설정 기반으로 변경 빈도가 낮음에도, 서버사이드 캐시 없이 매 로그인마다 외부 서버에 갱신을 요청하는 구조다.
 
 ## 문제점
 
