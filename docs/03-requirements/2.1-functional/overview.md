@@ -41,13 +41,13 @@
 
 | UC ID | Use Case명 | 주요 행위자 | 관련 FR | 관련 이슈 |
 |-------|-----------|-----------|--------|---------|
-| UC-01 | 사용자 권한 갱신 | 미팅 사용자 | FR-01 | ISSUE-02 |
-| UC-02 | 회의 개설 | 미팅 사용자, 연계시스템A/B/C | FR-03 | ISSUE-05, ISSUE-06 |
-| UC-03 | 회의 입장 | 미팅 사용자, 연계시스템A | FR-02 | ISSUE-01, ISSUE-03 |
-| UC-04 | 회의 조회 | 미팅 사용자, 연계시스템A | FR-04 | ISSUE-04 |
-| UC-05 | 참석자 초대 | 미팅 사용자 | FR-05 | ISSUE-04, ISSUE-07 |
-| UC-06 | 회의 종료 | 미팅 사용자 | FR-07 | ISSUE-05, ISSUE-06 |
-| UC-07 | 회의록 생성 | 미팅 사용자 | FR-08 | ISSUE-07 |
+| UC-01 | 사용자 권한 갱신 | 미팅 웹포탈, 미팅 모바일 앱 | FR-01 | ISSUE-02 |
+| UC-02 | 회의 개설 | 미팅 웹포탈, 미팅 모바일 앱 | FR-03 | ISSUE-05, ISSUE-06 |
+| UC-03 | 회의 입장 | 미팅 웹포탈, 미팅 모바일 앱 | FR-02 | ISSUE-01, ISSUE-03 |
+| UC-04 | 회의 조회 | 미팅 웹포탈, 미팅 모바일 앱 | FR-04 | ISSUE-04 |
+| UC-05 | 참석자 초대 | 미팅 웹포탈, 미팅 모바일 앱 | FR-05 | ISSUE-04, ISSUE-07 |
+| UC-06 | 회의 종료 | 미팅 웹포탈, 미팅 모바일 앱 | FR-07 | ISSUE-05, ISSUE-06 |
+| UC-07 | 회의록 생성 | 미팅 웹포탈, 미팅 모바일 앱 | FR-08 | ISSUE-07 |
 | UC-08 | 회의 초대/참석 알림 발송 | 시스템 (자동 발송) | FR-09 | ISSUE-05, ISSUE-06, ISSUE-08 |
 
 ### Use Case 관계
@@ -59,9 +59,9 @@
 
 ```mermaid
 graph LR
-    User(["👤 미팅 사용자"])
-    SysA(["🖥️ 연계시스템A"])
-    InServer(["📱 in서버·메일·push"])
+    WebPortal(["🌐 미팅 웹포탈"])
+    MobileApp(["📱 미팅 모바일 앱"])
+    InServer(["📨 in서버·메일·push"])
     MeetingAI(["🤖 meeting-ai 서버"])
     ACServer(["🔐 AC서버"])
     CopilotAdmin(["🔐 Copilot Admin 서버"])
@@ -77,18 +77,23 @@ graph LR
         UC08(["UC-08\n알림 발송"])
     end
 
-    User --> UC01
+    WebPortal --> UC01
+    WebPortal --> UC02
+    WebPortal --> UC03
+    WebPortal --> UC04
+    WebPortal --> UC05
+    WebPortal --> UC06
+    WebPortal --> UC07
+    MobileApp --> UC01
+    MobileApp --> UC02
+    MobileApp --> UC03
+    MobileApp --> UC04
+    MobileApp --> UC05
+    MobileApp --> UC06
+    MobileApp --> UC07
+
     ACServer -->|"AC 권한 갱신"| UC01
     CopilotAdmin -->|"LLM·용어사전 권한 갱신"| UC01
-    User --> UC02
-    User --> UC03
-    User --> UC04
-    User --> UC05
-    User --> UC06
-    User --> UC07
-    SysA --> UC02
-    SysA --> UC03
-    SysA --> UC04
 
     UC07 -.->|"«include»"| UC06
     UC08 -.->|"«include»"| UC02
