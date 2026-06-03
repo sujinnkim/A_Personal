@@ -2,7 +2,7 @@
 
 ## 현황
 
-포털 서버는 WC서버, VC서버, AC서버, AI서버, Copilot Admin 서버 등 다수의 외부 서버와 Feign(동기, read timeout 3,000ms) HTTP 호출로 연동한다. 외부 서버에 장애나 응답 지연이 발생하면 해당 호출 스레드는 read timeout(3,000ms) 만료까지 점유 상태를 유지하며, 이 과정에서 DB 커넥션도 함께 소비된다. 장애를 격리하거나 대체 응답을 제공하는 구조(폴백, 서킷 브레이커 등)가 없어 하나의 외부 서버 장애가 전체 서비스 영향으로 전파된다.
+포털 서버는 WC서버, VC서버, AC서버, AI서버, Copilot Admin 서버 등 다수의 외부 서버와 Feign(동기, read timeout 3,000ms) HTTP 호출로 연동한다. 외부 서버에 장애나 응답 지연이 발생하면 해당 호출 스레드는 read timeout(3,000ms) 만료까지 점유 상태를 유지하며, 이 과정에서 DB 커넥션도 함께 소비된다. 외부 서버 장애를 감지하여 해당 호출을 조기 차단하거나 스레드를 즉시 반환하는 구조(서킷 브레이커, fail-fast 등)가 없어, timeout 만료까지 스레드가 점유된 채 누적되며 이것이 전체 서비스 영향으로 전파된다.
 
 이는 사용자 요청 경로(front-api → Meeting Manager → server-api)뿐 아니라 피드백 흐름(cPaaS → Meeting Manager → server-api)에도 동일하게 적용된다.
 
