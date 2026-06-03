@@ -34,9 +34,6 @@
 | in서버 (SMS) | SMS 알림 발송 | FR-10 |
 | 메일 서버 | 이메일 알림 발송 | FR-10 |
 | push 서버 | 모바일 push 알림 발송 | FR-10 |
-| 연계시스템A | 동시 1000건 회의 시작, 1분간 10만 건 조회, 1분간 2만 건 참석 | FR-03, FR-04, FR-07 |
-| 연계시스템B | 회의실 장비 특정 시간 점유 | FR-03 |
-| 연계시스템C | 일반 통합회의 연계 시작 | FR-03 |
 
 ## 2.1.3. Use Case 목록
 
@@ -79,6 +76,7 @@ graph LR
     Batch(["⏰ 배치 시스템"])
     cPaaS(["⚙️ cPaaS"])
     AuthServer(["🔐 권한 서버\nAC / Copilot Admin"])
+    WCServer(["🖥️ WC서버"])
     InServer(["📨 in서버·메일·push"])
     MeetingAI(["🤖 meeting-ai 서버"])
 
@@ -102,12 +100,12 @@ graph LR
     Clients --> UC06
     Clients --> UC07
     Clients --> UC08
-    Clients --> UC09
 
     UC02 -.->|"예약 기반"| UC03
     Batch -->|"예약 시각 자동 트리거"| UC03
     cPaaS -->|"퇴장 이벤트"| UC05
     AuthServer -->|"권한 갱신"| UC01
+    UC04 -->|"입장 파라미터 전달\n(Feign 동기)"| WCServer
 
     UC03 -.->|"«include»"| UC01
     UC03 -.->|"«include»"| UC10
