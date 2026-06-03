@@ -76,20 +76,11 @@ graph LR
         MobileApp(["📱 모바일 앱"])
     end
 
-    subgraph InMeeting["인미팅 클라이언트"]
-        direction TB
-        PCClient(["🖥️ PC 클라이언트"])
-        MobileClient(["📱 모바일 클라이언트"])
-    end
-
     Batch(["⏰ 배치 시스템"])
     cPaaS(["⚙️ cPaaS"])
-    Knox(["🏢 Knox 임직원 포탈"])
+    AuthServer(["🔐 권한 서버\nAC / Copilot Admin"])
     InServer(["📨 in서버·메일·push"])
     MeetingAI(["🤖 meeting-ai 서버"])
-    ACServer(["🔐 AC서버"])
-    CopilotAdmin(["🔐 Copilot Admin 서버"])
-    WCVCServer(["🖥️ WC/VC서버"])
 
     subgraph MeetingPortal["미팅 포털 서버"]
         UC01(["UC-01\n사용자 권한 갱신"])
@@ -115,16 +106,8 @@ graph LR
 
     UC02 -.->|"예약 기반"| UC03
     Batch -->|"예약 시각 자동 트리거"| UC03
-
-    UC04 -->|"입장 시 실행"| InMeeting
-    InMeeting --> cPaaS
     cPaaS -->|"퇴장 이벤트"| UC05
-
-    ACServer -->|"AC 권한 갱신"| UC01
-    CopilotAdmin -->|"LLM·용어사전 권한 갱신"| UC01
-    WCVCServer --> UC03
-    WCVCServer --> UC06
-    UC07 --> Knox
+    AuthServer -->|"권한 갱신"| UC01
 
     UC03 -.->|"«include»"| UC01
     UC03 -.->|"«include»"| UC10
