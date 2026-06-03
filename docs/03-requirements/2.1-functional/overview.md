@@ -59,8 +59,12 @@
 
 ```mermaid
 graph LR
-    WebPortal(["🌐 미팅 웹포탈"])
-    MobileApp(["📱 미팅 모바일 앱"])
+    subgraph Clients["미팅 클라이언트"]
+        direction TB
+        WebPortal(["🌐 웹포탈"])
+        MobileApp(["📱 모바일 앱"])
+    end
+
     InServer(["📨 in서버·메일·push"])
     MeetingAI(["🤖 meeting-ai 서버"])
     ACServer(["🔐 AC서버"])
@@ -77,20 +81,13 @@ graph LR
         UC08(["UC-08\n알림 발송"])
     end
 
-    WebPortal --> UC01
-    WebPortal --> UC02
-    WebPortal --> UC03
-    WebPortal --> UC04
-    WebPortal --> UC05
-    WebPortal --> UC06
-    WebPortal --> UC07
-    MobileApp --> UC01
-    MobileApp --> UC02
-    MobileApp --> UC03
-    MobileApp --> UC04
-    MobileApp --> UC05
-    MobileApp --> UC06
-    MobileApp --> UC07
+    Clients --> UC01
+    Clients --> UC02
+    Clients --> UC03
+    Clients --> UC04
+    Clients --> UC05
+    Clients --> UC06
+    Clients --> UC07
 
     ACServer -->|"AC 권한 갱신"| UC01
     CopilotAdmin -->|"LLM·용어사전 권한 갱신"| UC01
