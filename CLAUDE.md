@@ -10,9 +10,9 @@
 
 | 에이전트 | 역할 | 담당 경로 |
 |---------|------|---------|
-| `architecture-designer` | 아키텍처 설계 문서 작성 | `docs/01-plan` ~ `docs/05-architecture-design` |
-| `prototype-developer` | Java/Spring Boot 프로토타입 구현 및 검증 | `prototype/`, `docs/06-verification` |
-| `report-writer` | 최종 레포트(.docx) 생성 | `scripts/`, `report/` |
+| `docs-agent` | 아키텍처 설계 문서 작성 | `docs/` |
+| `prototype-agent` | PoC 프로토타입 구현 및 검증 환경 구성 | `prototype/` |
+| `report-agent` | 레포트 분할 파일 관리 (docs → report 동기화) | `report/` |
 
 ---
 
