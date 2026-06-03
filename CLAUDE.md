@@ -11,7 +11,7 @@
 | 에이전트 | 역할 | 담당 경로 |
 |---------|------|---------|
 | `architecture-designer` | 아키텍처 설계 문서 작성 | `docs/01-plan` ~ `docs/05-architecture-design` |
-| `prototype-developer` | Java/Spring Boot 프로토타입 구현 및 검증 | `src/`, `docs/06-verification` |
+| `prototype-developer` | Java/Spring Boot 프로토타입 구현 및 검증 | `prototype/`, `docs/06-verification` |
 | `report-writer` | 최종 레포트(.docx) 생성 | `scripts/`, `report/` |
 
 ---
@@ -37,14 +37,20 @@ A_Personal/
 │   ├── 05-architecture-design/
 │   │   ├── 4.1-conceptual/
 │   │   ├── 4.2-execution/
+│   │   │   ├── 4.2.1-runtime-view/
+│   │   │   ├── 4.2.2-module-view/
+│   │   │   └── 4.2.3-deployment-view/
 │   │   └── 4.3-evaluation/
 │   └── 06-verification/
+├── guides/                # 환경 설정 가이드
 ├── material/              # 과제 주요 참고 자료
 ├── memo/                  # 사용자 개인 메모 — 에이전트 참조 금지
-├── src/
+├── prototype/
 ├── report/
-│   ├── template/
-│   └── output/
+│   ├── 1/ ~ 5/            # 챕터별 최종 문서
+│   ├── drawio/            # 다이어그램 소스
+│   ├── images/            # 다이어그램 이미지
+│   └── googledocs-scripts/
 └── scripts/
     └── generate_report.py
 ```
