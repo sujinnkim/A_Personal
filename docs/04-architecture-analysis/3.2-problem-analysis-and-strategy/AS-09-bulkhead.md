@@ -105,6 +105,8 @@ flowchart TD
     style QP fill:#d4edda,color:#000
     style BP fill:#ff9999,color:#000
 ```
+<!-- 이미지 파일명(draw.io → PNG 교체 시): report/images/as09-bulkhead.png -->
+<p align="center"><em>[그림 AS09-1] HikariCP 커넥션 풀 — 단일 풀(As-is)과 도메인별 Bulkhead(To-Be) 비교</em></p>
 
 ## 채택
 

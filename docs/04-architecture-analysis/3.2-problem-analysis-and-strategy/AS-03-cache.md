@@ -72,6 +72,8 @@ flowchart TD
 
     style PREWARM fill:#d4edda,color:#000
 ```
+<!-- 이미지 파일명(draw.io → PNG 교체 시): report/images/as03-cache-flow.png -->
+<p align="center"><em>[그림 AS03-1] L1(Caffeine) · L2(Redis) 계층 캐시 조회 흐름</em></p>
 
 ## 채택
 

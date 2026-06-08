@@ -54,6 +54,37 @@
 
 **한계**: 서블릿 모델에서 요청을 큐에 넣고 다른 스레드로 넘기는 구조는 서블릿 스레드의 요청-응답 사이클과 맞지 않아 구현 복잡도가 높다. 응답 객체(`HttpServletResponse`)의 스레드 귀속 문제, 타임아웃 처리, 큐 자체의 메모리 관리 등 부가 문제가 발생한다. 디버깅과 운영 가시성도 저하된다.
 
+## Connector 분리 구조
+
+```mermaid
+flowchart LR
+    CLIENT["클라이언트"]
+
+    subgraph NGINX["Nginx / API Gateway"]
+        ROUTE["URL 패턴 라우팅"]
+    end
+
+    subgraph TOMCAT["front-api (Tomcat)"]
+        direction TB
+        C8081["포트 8081\n입장 전용 Connector\nmaxThreads=100 · minSpareThreads=50"]
+        C8080["포트 8080\n일반 Connector\nmaxThreads=200"]
+    end
+
+    ENTRY["domain.entry\n회의 입장 처리"]
+    OTHER["domain.auth · domain.meeting\n권한 갱신 · 회의 관리 · 조회"]
+
+    CLIENT --> NGINX
+    NGINX -->|"/meetings/*/join\n/conference-token"| C8081
+    NGINX -->|"그 외 모든 API"| C8080
+    C8081 --> ENTRY
+    C8080 --> OTHER
+
+    style C8081 fill:#d4edda,color:#000
+    style C8080 fill:#cce5ff,color:#000
+```
+<!-- 이미지 파일명(draw.io → PNG 교체 시): report/images/as04-priority-connector.png -->
+<p align="center"><em>[그림 AS04-1] Tomcat Connector 포트 분리 — 입장 전용(8081)과 일반(8080) 구분</em></p>
+
 ## 채택
 
 **채택 대안**: 대안 2 — URL 패턴 기반 전용 Connector·스레드 풀 분리
