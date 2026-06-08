@@ -54,6 +54,25 @@ ISSUE-02의 구조적 문제는 `CompletableFuture.allOf()` 대기 패턴이다.
 
 **장점**: 피크 시간대 외부 서버 요청을 L1·L2 캐시 히트로 대부분 흡수하여 외부 서버 부하를 대폭 감소시킨다. 인스턴스 수 증가 시에도 L2 Redis를 공유하므로 외부 서버 요청이 선형 증가하지 않는다. 또한 AS-07(Predictive Pre-warming)이 피크 전에 L2 Redis를 선제 적재하면 피크 초입 cold start 없이 캐시 히트율을 유지할 수 있다.
 
+## 캐시 계층 구조
+
+```mermaid
+flowchart TD
+    REQ["GET /members/{email}"]
+
+    REQ --> L1{"L1 Caffeine\n(인스턴스 로컬, TTL 5분)"}
+    L1 -->|히트| RET["응답 반환"]
+    L1 -->|미스| L2{"L2 Redis\n(분산 공유, TTL 30분~1h)"}
+    L2 -->|히트| L1W["L1 적재 후 반환"]
+    L2 -->|미스| EXT["외부 서버 호출\n(AC서버, Copilot Admin)"]
+    EXT --> BOTH["L1 + L2 동시 적재 후 반환"]
+
+    PREWARM["AS-07 Pre-warming\n피크 N분 전 선제 적재"]
+    PREWARM -->|선제 적재| L2
+
+    style PREWARM fill:#d4edda,color:#000
+```
+
 ## 채택
 
 **채택 대안**: 대안 3 — 계층화 캐시 (L1 로컬 + L2 분산)

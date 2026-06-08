@@ -2,7 +2,7 @@
 
 ## 현황
 
-VC 또는 AC가 포함된 회의 개설 요청은 front-api에서 유효성 검사와 전처리를 마친 후 Meeting Manager를 거쳐 server-api로 전달된다. server-api는 VC서버, AC서버 등 외부 벤더 연동 서버에 **Feign(동기)** HTTP 호출을 수행하고, 모든 응답을 수신한 뒤 포털 서버 응답을 반환한다. 현재 Feign 타임아웃은 connect 1,000ms / read 3,000ms로 전체 외부 호출에 일괄 적용되며, 서버별 타임아웃 세분화나 장애 차단 메커니즘이 없어 정상 범위 내의 응답 지연(예: 200ms~800ms)도 포털 서버 응답에 그대로 반영된다.
+VC 또는 AC가 포함된 회의 개설 요청은 front-api에서 유효성 검사와 전처리를 마친 후 Meeting Manager를 거쳐 server-api로 전달된다. server-api는 VC서버, AC서버 등 외부 벤더 연동 서버에 **Feign(동기)** HTTP 호출을 수행하고, 모든 응답을 수신한 뒤 포털 서버 응답을 반환한다. 현재 Feign 타임아웃은 connect 1,000ms / read 3,000ms로 전체 외부 호출에 일괄 적용되며, 서버별 타임아웃 세분화나 차등 장애 차단 메커니즘 없이 정상 범위 내의 응답 지연(예: 200ms~800ms)도 포털 서버 응답에 그대로 반영된다.
 
 ```
 VC/AC 포함 회의 개설 요청
@@ -12,6 +12,24 @@ VC/AC 포함 회의 개설 요청
        ├── VC 벤더 서버 호출 (동기) → 응답 대기
        └── AC 벤더 서버 호출 (동기) → 응답 대기
   → 전체 응답 반환
+```
+
+```mermaid
+sequenceDiagram
+    participant FA as front-api
+    participant SA as server-api
+    participant VC as VC서버
+    participant AC as AC서버
+
+    FA->>SA: VC/AC 포함 회의 개설 요청
+    SA->>+VC: VC서버 동기 호출 (Feign)
+    Note over SA,VC: 응답 대기 (최대 3,000ms)
+    VC-->>-SA: VC서버 응답
+    SA->>+AC: AC서버 동기 호출 (Feign)
+    Note over SA,AC: 응답 대기 (최대 3,000ms)
+    AC-->>-SA: AC서버 응답
+    SA-->>FA: 회의 개설 응답 반환
+    Note over FA,SA: ⚠ VC + AC 순차 호출 시<br/>최대 6,000ms 스레드 점유
 ```
 
 외부 연동 실패 또는 정합성 오류 발생 시 server-api는 에러를 반환하고 전체 회의 생성 요청이 실패한다.

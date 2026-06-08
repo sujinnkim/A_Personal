@@ -4,6 +4,26 @@
 
 front-api의 서블릿 스레드 풀은 모든 API 요청을 단일 큐(FIFO)로 수신하여 처리한다. conference-token 발급·입장 파라미터 생성 등 회의 입장 처리, 단순 조회 API, 권한 갱신 요청 등 중요도와 처리 비용이 서로 다른 요청이 동일한 우선순위로 경쟁한다.
 
+```mermaid
+flowchart LR
+    subgraph FIFO["단일 FIFO 서블릿 스레드 큐"]
+        R1["단순 조회 API\n(낮은 중요도)"]
+        R2["권한 갱신 요청\n(외부 서버 다중 호출)"]
+        R3["입장 파라미터 생성\n⚠ 최우선"]
+        R4["conference-token 발급\n⚠ 최우선"]
+    end
+
+    R1 --> R2 --> R3 --> R4
+
+    NOTE["⚠ 낮은 중요도 요청이\n스레드를 먼저 선점하면\n핵심 입장 요청이\n큐에서 대기"]
+
+    FIFO -.->|우선순위 역전| NOTE
+
+    style R3 fill:#ff9999,color:#000
+    style R4 fill:#ff9999,color:#000
+    style R2 fill:#ffcc99,color:#000
+```
+
 ## 문제점
 
 - 요청 집중 구간에 단순 조회 API가 스레드를 점유하면, 최우선으로 처리되어야 할 conference-token 발급·입장 파라미터 생성 요청이 큐에서 대기하게 된다.

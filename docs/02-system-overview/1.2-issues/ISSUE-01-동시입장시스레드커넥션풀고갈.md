@@ -14,6 +14,23 @@
        └── WC서버에 입장 파라미터 전달 (Feign 동기, read timeout 3,000ms)  ← 스레드 점유
 ```
 
+```mermaid
+sequenceDiagram
+    participant U as 2만 명 사용자
+    participant TP as 서블릿 스레드 풀
+    participant DB as MariaDB
+    participant WC as WC서버
+
+    U->>+TP: 입장 파라미터 생성 요청 (동시 집중)
+    TP->>+DB: 사용자 권한 조회 (커넥션 소비)
+    DB-->>-TP: 권한 데이터 반환
+    TP->>+WC: 입장 파라미터 전달 (Feign 동기, timeout 3,000ms)
+    Note over TP,WC: ⚠ 스레드 최대 3,000ms 점유
+    Note over TP: 스레드 풀 포화 → 신규 요청 수용 불가
+    WC-->>-TP: 응답
+    Note over U: ⚠ 신규 입장 요청 처리 불가 → 입장 실패
+```
+
 ## 문제점
 
 - WC서버에 입장 파라미터를 전달하는 Feign 동기 호출 동안 해당 요청의 스레드가 최대 3,000ms 점유 상태로 대기한다.

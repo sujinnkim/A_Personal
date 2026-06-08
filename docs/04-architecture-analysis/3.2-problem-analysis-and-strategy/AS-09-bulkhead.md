@@ -72,6 +72,40 @@ QA-03의 측정 기준은 "입장 전용 커넥션 풀 고갈 시 회의 시작 
 
 **장점**: 두 차원의 격리가 결합되어 ISSUE-01·04·06이 동시에 해소된다. AS-02 비동기 처리 기반 위에서 스레드 풀 격리가 의미를 가진다.
 
+## 격리 구조 비교
+
+```mermaid
+flowchart TD
+    subgraph BEFORE["As-is — 단일 풀 공유"]
+        BP["HikariCP 단일 풀\n(모든 기능 공유)"]
+        B1["입장 처리"] --> BP
+        B2["회의 시작·초대"] --> BP
+        B3["권한 갱신·조회"] --> BP
+        BP --> BDB[("MariaDB")]
+        NOTE_B["⚠ 입장 처리가 풀을 소진하면\n전체 기능 DB 접근 불가"]
+    end
+
+    subgraph AFTER["To-Be — Bulkhead 격리"]
+        JP["join-pool\n50 conn\n입장 처리 전용"]
+        SP["service-pool\n30 conn\n회의 시작·초대"]
+        GP["general-pool\n30 conn\n권한 갱신·조회"]
+        QP["query-pool\n30 conn\nRead 전용"]
+        A1["입장 처리"] --> JP
+        A2["회의 시작·초대"] --> SP
+        A3["권한 갱신·조회"] --> GP
+        A4["참석자 조회(read)"] --> QP
+        JP & SP & GP --> APRI[("Primary")]
+        QP --> AREP[("Replica")]
+        NOTE_A["입장 풀 고갈 시에도\n타 기능 풀은 독립 유지"]
+    end
+
+    style JP fill:#d4edda,color:#000
+    style SP fill:#d4edda,color:#000
+    style GP fill:#d4edda,color:#000
+    style QP fill:#d4edda,color:#000
+    style BP fill:#ff9999,color:#000
+```
+
 ## 채택
 
 **채택 대안**: 대안 3 — 이중 Bulkhead (DB 커넥션 풀 + 스레드 풀 동시 격리)

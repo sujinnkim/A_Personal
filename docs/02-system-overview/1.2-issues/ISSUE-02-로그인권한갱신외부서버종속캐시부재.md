@@ -16,6 +16,30 @@ GET /members/{email}
   CompletableFuture.allOf() 대기 → 응답 반환
 ```
 
+```mermaid
+sequenceDiagram
+    participant C as 클라이언트
+    participant FA as front-api
+    participant AC as AC서버
+    participant CP1 as Copilot Admin<br/>(LLM 권한)
+    participant CP2 as Copilot Admin<br/>(용어사전 권한)
+
+    C->>FA: GET /members/{email}
+    par 비동기 병렬 호출
+        FA->>+AC: AC 권한 갱신 요청
+    and
+        FA->>+CP1: LLM 권한 갱신 요청
+    and
+        FA->>+CP2: 용어사전 권한 갱신 요청
+    end
+    Note over FA: CompletableFuture.allOf() 대기
+    CP1-->>-FA: 응답 (빠름)
+    AC-->>-FA: 응답 (보통)
+    CP2-->>-FA: 응답 (느림 — 피크 시 지연)
+    Note over FA: ⚠ 가장 느린 서버 응답까지 전체 대기
+    FA-->>C: 권한 정보 반환 (전체 응답 시간 = 최대 지연)
+```
+
 AC 권한은 로그인 시 AC 서버를 호출하여 확인한 뒤 DB에 저장되며, WC/VC 권한(SDC)은 DB 조회로 확인된다. 그러나 AC·LLM·용어사전 권한은 회사 계약 및 관리자 설정 기반으로 변경 빈도가 낮음에도, 서버사이드 캐시 없이 매 로그인마다 외부 서버에 갱신을 요청하는 구조다.
 
 ## 문제점
