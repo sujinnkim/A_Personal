@@ -17,24 +17,27 @@ VC/AC 포함 회의 개설 요청
 ```mermaid
 sequenceDiagram
     participant FA as front-api
+    participant MM as Meeting Manager
     participant SA as server-api
     participant VC as VC서버
     participant AC as AC서버
 
-    FA->>SA: VC/AC 포함 회의 개설 요청
+    FA->>MM: VC/AC 포함 회의 개설 요청
+    MM->>SA: 통합컨퍼런스 개설 요청
     SA->>+VC: VC서버 동기 호출 (Feign)
     Note over SA,VC: 응답 대기 (최대 3,000ms)
     VC-->>-SA: VC서버 응답
     SA->>+AC: AC서버 동기 호출 (Feign)
     Note over SA,AC: 응답 대기 (최대 3,000ms)
     AC-->>-SA: AC서버 응답
-    SA-->>FA: 회의 개설 응답 반환
+    SA-->>MM: 응답
+    MM-->>FA: 회의 개설 응답 반환
     Note over FA,SA: ⚠ VC + AC 순차 호출 시<br/>최대 6,000ms 스레드 점유
 ```
 
 외부 연동 실패 또는 정합성 오류 발생 시 server-api는 에러를 반환하고 전체 회의 생성 요청이 실패한다.
 
-WC 전용 회의는 Meeting Manager 레벨에서 완결되어 server-api 호출이 발생하지 않지만, 입장 시 WC서버에 입장 파라미터를 전달하는 동기 호출은 여전히 존재한다.
+WC 포함 회의는 Meeting Manager → cPaaS(채널 생성·actor 매핑) 경로로 처리되어 VC/AC 벤더 서버의 직접 동기 호출이 발생하지 않는다. 그러나 회의 입장 시 front-api에서 Meeting Manager로 입장 파라미터를 전달하는 Feign 동기 호출은 여전히 존재한다.
 
 ## 문제점
 

@@ -15,36 +15,36 @@
 
 | AS | 전략명 | 해결 이슈 | 핵심 드라이버 |
 |----|--------|---------|-------------|
-| AS-01 | MSA / 도메인 서비스 분리 | ISSUE-04, ISSUE-07, ISSUE-08 | AD-03 |
-| AS-02 | 메시지 큐 기반 비동기 처리 | ISSUE-01, ISSUE-05, ISSUE-06 | AD-02, AD-04 |
-| AS-03 | 캐시 기반 응답 속도 개선 | ISSUE-02, ISSUE-05, ISSUE-09 | AD-01 |
-| AS-04 | 요청 우선순위 큐 | ISSUE-01, ISSUE-03 | AD-02 |
-| AS-05 | Eager Response + 비동기 후처리 | ISSUE-01, ISSUE-02, ISSUE-05 | AD-02, AD-04 |
-| AS-06 | Time-based Throttling | ISSUE-03, ISSUE-09 | AD-02, AD-04 |
-| AS-07 | Predictive Pre-warming | ISSUE-09 | AD-01, AD-02, AD-04 |
-| AS-08 | CQRS | ISSUE-07 | AD-03 |
-| AS-09 | Bulkhead 격리 | ISSUE-01, ISSUE-04, ISSUE-06 | AD-03, AD-04 |
-| AS-10 | Circuit Breaker / Fallback | ISSUE-02, ISSUE-06, ISSUE-08 | AD-04 |
-| AS-11 | Anti-Corruption Layer (ACL) | ISSUE-08 | AD-09, AD-10 |
+| AS-01 | 입장 처리 도메인 경계 분리 | ISSUE-04, ISSUE-07, ISSUE-08 | AD-03 |
+| AS-02 | 입장 처리 경로 비동기 전환 | ISSUE-01, ISSUE-05, ISSUE-06 | AD-02, AD-04 |
+| AS-03 | 외부 권한 조회 다층 캐시 적용 | ISSUE-02, ISSUE-05, ISSUE-09 | AD-01 |
+| AS-04 | 입장 전용 처리 경로 확보 | ISSUE-01, ISSUE-03 | AD-02 |
+| AS-05 | 회의 입장 응답 조기 반환 | ISSUE-01, ISSUE-02, ISSUE-05 | AD-02, AD-04 |
+| AS-06 | 피크 구간 요청 유입 제한 | ISSUE-03, ISSUE-09 | AD-02, AD-04 |
+| AS-07 | 예약 기반 피크 자원 선제 초기화 | ISSUE-09 | AD-01, AD-02, AD-04 |
+| AS-08 | 조회·입장 DB 경로 분리 | ISSUE-07 | AD-03 |
+| AS-09 | 기능별 커넥션·스레드 격벽 분리 | ISSUE-01, ISSUE-04, ISSUE-06 | AD-03, AD-04 |
+| AS-10 | 외부 서버 장애 차단 및 계층 복구 | ISSUE-02, ISSUE-06, ISSUE-08 | AD-04 |
+| AS-11 | 외부 연계 의존성 캡슐화 | ISSUE-08 | AD-09, AD-10 |
 
 ## 기본 전략과 파생 전략의 관계
 
 일부 AS는 다른 AS의 설계 결정이 선행되어야 적용 가능하다. 아래 파생 관계를 기준으로 적용 순서를 결정한다.
 
 ```
-AS-01 (도메인 모듈 분리)
-  ├── AS-09 (Bulkhead)     — AS-01이 설정한 도메인 경계별로 커넥션 풀 격리를 구현
-  ├── AS-08 (CQRS)         — AS-01의 도메인 경계 내에서 Command/Query 모델 분리
-  └── AS-11 (ACL)          — AS-01의 외부 연계 모듈 분리를 구현하는 패턴
+AS-01 (도메인 경계 분리)
+  ├── AS-09 (격벽 분리)     — AS-01이 설정한 도메인 경계별로 커넥션 풀 격리를 구현
+  ├── AS-08 (DB 경로 분리)  — AS-01의 도메인 경계 내에서 Command/Query 경로 분리
+  └── AS-11 (의존성 캡슐화) — AS-01의 외부 연계 모듈 분리를 구현하는 패턴
 
-AS-02 (메시지 큐 비동기)
-  └── AS-05 (Eager Response) — AS-02의 비동기 처리 기반 위에서 응답 패턴 정의
+AS-02 (비동기 전환)
+  └── AS-05 (조기 반환)     — AS-02의 비동기 처리 기반 위에서 응답 패턴 정의
 
-AS-03 (캐시)
-  └── AS-07 (Pre-warming)    — AS-03의 캐시 인프라가 존재해야 선제 적재 가능
+AS-03 (다층 캐시)
+  └── AS-07 (선제 초기화)   — AS-03의 캐시 인프라가 존재해야 선제 적재 가능
 
-AS-07 (Pre-warming)
-  └── AS-06 (Throttling)     — Pre-warming 스케줄러가 피크 임박을 감지하면 Throttling 동시 활성화
+AS-07 (선제 초기화)
+  └── AS-06 (유입 제한)     — Pre-warming 스케줄러가 피크 임박을 감지하면 Throttling 동시 활성화
 ```
 
 ## 기능 드라이버 충족 관계
@@ -53,6 +53,6 @@ AD-05(로그인 시 권한 갱신 처리), AD-06(2만 명 동시 회의 입장),
 
 | 기능 드라이버 | 충족하는 QA 전략 |
 |-------------|---------------|
-| AD-05 로그인 시 권한 갱신 처리 | AS-03 (캐시) + AS-07 (Pre-warming) |
-| AD-06 2만 명 동시 회의 입장 | AS-02 (비동기) + AS-04 (우선순위 큐) + AS-09 (Bulkhead) |
-| AD-07 외부 서버 포함 회의 시작 | AS-02 (비동기) + AS-10 (Circuit Breaker) |
+| AD-05 로그인 시 권한 갱신 처리 | AS-03 (다층 캐시) + AS-07 (선제 초기화) |
+| AD-06 2만 명 동시 회의 입장 | AS-02 (비동기 전환) + AS-04 (전용 경로 확보) + AS-09 (격벽 분리) |
+| AD-07 외부 서버 포함 회의 시작 | AS-02 (비동기 전환) + AS-10 (장애 차단 및 복구) |
