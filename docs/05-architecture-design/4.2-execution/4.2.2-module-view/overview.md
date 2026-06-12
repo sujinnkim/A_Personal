@@ -153,12 +153,12 @@ flowchart TD
 
 | Bean 명 | 타입 | 역할 | 관련 AS |
 |--------|-----|------|--------|
-| `externalCallExecutor` | `ThreadPoolTaskExecutor` | 외부 서버 Feign 호출 전용 비동기 스레드 풀 (corePoolSize=200, maxPoolSize=800, queueCapacity=4,000) | AS-02 |
+| `externalCallExecutor` | `ThreadPoolTaskExecutor` | 외부 서버 Feign 호출 전용 비동기 스레드 풀 (corePoolSize=100, maxPoolSize=500, queueCapacity=2,000) | AS-02 |
 | `preWarmExecutor` | `ThreadPoolTaskExecutor` | Pre-warming 전담 저우선순위 스레드 풀 | AS-06 |
-| `joinDataSource` | `HikariDataSource` | 입장 처리 전용 커넥션 풀 (maxPool=200, connTimeout=3,000ms) | AS-08 |
-| `serviceDataSource` | `HikariDataSource` | 회의 시작·초대 전용 커넥션 풀 (maxPool=60, connTimeout=5,000ms) | AS-08 |
-| `generalDataSource` | `HikariDataSource` | 권한 갱신·일반 조회 커넥션 풀 (maxPool=120, connTimeout=5,000ms) | AS-08 |
-| `queryDataSource` | `HikariDataSource` | Read 전용 Replica 커넥션 풀 (maxPool=120, connTimeout=3,000ms) | AS-07, AS-08 |
+| `joinDataSource` | `HikariDataSource` | 입장 처리 전용 커넥션 풀 (maxPool=100, connTimeout=3,000ms) | AS-08 |
+| `serviceDataSource` | `HikariDataSource` | 회의 시작·초대 전용 커넥션 풀 (maxPool=40, connTimeout=5,000ms) | AS-08 |
+| `generalDataSource` | `HikariDataSource` | 권한 갱신·일반 조회 커넥션 풀 (maxPool=60, connTimeout=5,000ms) | AS-08 |
+| `queryDataSource` | `HikariDataSource` | Read 전용 Replica 커넥션 풀 (maxPool=80, connTimeout=3,000ms) | AS-07, AS-08 |
 | `caffeineCacheManager` | `CaffeineCacheManager` | L1 인스턴스 로컬 캐시 관리 (TTL 5분) | AS-03 |
 | `redisCacheManager` | `RedisCacheManager` | L2 분산 공유 캐시 관리 (TTL 30분~1시간) | AS-03 |
 | `compositeCacheManager` | `CompositeCacheManager` | L1 → L2 순서 계층 캐시 라우팅 | AS-03 |

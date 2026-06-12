@@ -21,8 +21,8 @@ flowchart TD
 
         subgraph APP_TIER["front-api (Spring Boot + Tomcat)  — 수평 확장 인스턴스"]
             direction LR
-            C8081["Tomcat Connector\nport 8081\n입장 전용  AS-04\nmaxThreads=400\nminSpareThreads=100"]
-            C8080["Tomcat Connector\nport 8080\n일반  AS-04\nmaxThreads=400"]
+            C8081["Tomcat Connector\nport 8081\n입장 전용  AS-04\nmaxThreads=200\nminSpareThreads=50"]
+            C8080["Tomcat Connector\nport 8080\n일반  AS-04\nmaxThreads=300"]
 
             subgraph FILTER["AS-05 ThrottlingFilter"]
                 TF["ThrottlingInterceptor\n(port 8080 경로만 적용)"]
@@ -40,7 +40,7 @@ flowchart TD
                 CP_INT["integration.copilot\nAS-09 CB"]
             end
 
-            ASYNC["externalCallExecutor\nAS-02 @Async\ncorePoolSize=200 · maxPoolSize=800"]
+            ASYNC["externalCallExecutor\nAS-02 @Async\ncorePoolSize=100 · maxPoolSize=500"]
 
             SCH["PreWarmingScheduler\nAS-06\n(front-api 내장, 1분 주기)"]
         end
@@ -53,10 +53,10 @@ flowchart TD
 
         subgraph POOL_TIER["HikariCP Bulkhead  AS-08"]
             direction LR
-            JP["join-pool\n200 conn  AS-08"]
-            SP["service-pool\n60 conn  AS-08"]
-            GP["general-pool\n120 conn  AS-08"]
-            QP["query-pool\n120 conn  AS-07 AS-08"]
+            JP["join-pool\n100 conn  AS-08"]
+            SP["service-pool\n40 conn  AS-08"]
+            GP["general-pool\n60 conn  AS-08"]
+            QP["query-pool\n80 conn  AS-07 AS-08"]
         end
 
         subgraph DB_TIER["MariaDB  AS-07 CQRS"]
@@ -127,24 +127,24 @@ flowchart TD
 
 | Connector | 포트 | maxThreads | minSpareThreads | 용도 |
 |---------|-----|-----------|----------------|------|
-| 입장 전용 | 8081 | 400 | 100 | /join, /conference-token 전용 |
-| 일반 | 8080 | 400 | 기본값 | 조회·권한 갱신·관리 |
+| 입장 전용 | 8081 | 200 | 50 | /join, /conference-token 전용 |
+| 일반 | 8080 | 300 | 기본값 | 조회·권한 갱신·관리 |
 
 ### AsyncTaskExecutor 설정 (AS-02)
 
 | Bean | corePoolSize | maxPoolSize | queueCapacity | 용도 |
 |-----|------------|------------|--------------|------|
-| `externalCallExecutor` | 200 | 800 | 4,000 | 외부 서버 Feign 호출 전담 |
+| `externalCallExecutor` | 100 | 500 | 2,000 | 외부 서버 Feign 호출 전담 |
 | `preWarmExecutor` | 10 | 50 | 1,000 | Pre-warming 전담 (저우선순위) |
 
 ### HikariCP 커넥션 풀 구성 (AS-08)
 
 | 풀 이름 | 대상 DataSource | maximumPoolSize | connectionTimeout | 용도 |
 |--------|--------------|----------------|-----------------|------|
-| join-pool | joinDataSource (Primary) | 200 | 3,000ms | 입장 처리 전용 |
-| service-pool | serviceDataSource (Primary) | 60 | 5,000ms | 회의 시작·초대 |
-| general-pool | generalDataSource (Primary) | 120 | 5,000ms | 권한 갱신·일반 조회 |
-| query-pool | queryDataSource (Replica) | 120 | 3,000ms | Read 전용 (AS-07 CQRS) |
+| join-pool | joinDataSource (Primary) | 100 | 3,000ms | 입장 처리 전용 |
+| service-pool | serviceDataSource (Primary) | 40 | 5,000ms | 회의 시작·초대 |
+| general-pool | generalDataSource (Primary) | 60 | 5,000ms | 권한 갱신·일반 조회 |
+| query-pool | queryDataSource (Replica) | 80 | 3,000ms | Read 전용 (AS-07 CQRS) |
 
 ### 캐시 계층 구성 (AS-03)
 
