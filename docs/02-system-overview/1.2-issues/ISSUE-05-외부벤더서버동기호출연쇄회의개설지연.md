@@ -2,7 +2,7 @@
 
 ## 현황
 
-VC 또는 AC가 포함된 회의 개설 요청은 front-api에서 유효성 검사와 전처리를 마친 후 Meeting Manager를 거쳐 server-api로 전달된다. server-api는 VC서버, AC서버 등 외부 벤더 연동 서버에 **Feign(동기)** HTTP 호출을 수행하고, 모든 응답을 수신한 뒤 포털 서버 응답을 반환한다. 현재 Feign 타임아웃은 connect 1,000ms / read 3,000ms로 전체 외부 호출에 일괄 적용되며, 서버별 타임아웃 세분화나 차등 장애 차단 메커니즘 없이 정상 범위 내의 응답 지연(예: 200ms~800ms)도 포털 서버 응답에 그대로 반영된다.
+VC 또는 AC가 포함된 회의 개설 요청은 front-api에서 유효성 검사와 전처리를 마친 후 Meeting Manager를 거쳐 server-api로 전달된다. server-api는 VC서버, AC서버 등 외부 벤더 연동 서버에 **Feign(동기)** HTTP 호출을 수행하고, 모든 응답을 수신한 뒤 포털 서버 응답을 반환한다. 현재 Feign 타임아웃은 connect 1,000ms / read 3,000ms를 기본값으로 하며 서버별 개별 설정이 가능하다. 그러나 VC서버·AC서버에 대한 Feign 동기 호출이 순차적으로 수행되어 각 서버의 응답을 기다리는 동안 해당 스레드가 점유 상태를 유지하며, 정상 범위 내의 응답 지연(예: 200ms~800ms)도 포털 서버 응답에 그대로 반영된다.
 
 ```
 VC/AC 포함 회의 개설 요청
@@ -37,7 +37,7 @@ sequenceDiagram
 
 외부 연동 실패 또는 정합성 오류 발생 시 server-api는 에러를 반환하고 전체 회의 생성 요청이 실패한다.
 
-WC 포함 회의는 Meeting Manager → cPaaS(채널 생성·actor 매핑) 경로로 처리되어 VC/AC 벤더 서버의 직접 동기 호출이 발생하지 않는다. 그러나 회의 입장 시 front-api에서 Meeting Manager로 입장 파라미터를 전달하는 Feign 동기 호출은 여전히 존재한다.
+WC 포함 회의는 Meeting Manager → cPaaS(채널 생성·actor 매핑) 경로로 처리되어 VC/AC 벤더 서버의 직접 동기 호출이 발생하지 않는다. 그러나 회의 입장 시 front-api에서 Meeting Manager에 참석자 입장 정보를 조회하는 Feign 동기 호출은 여전히 존재한다.
 
 ## 문제점
 

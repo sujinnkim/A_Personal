@@ -7,7 +7,7 @@
 write 경합의 발생 경로는 두 가지다:
 
 - **front-api 경유 (셀프 참석자 한정)**: `User → front-api → participants INSERT` — 오픈회의에 사전 초대 없이 입장하는 셀프 참석자의 경우 입장 API 호출 시 front-api가 participants 테이블에 INSERT한다. 사전 초대된 참석자는 이미 레코드가 존재하므로 이 시점에 DB write가 발생하지 않는다.
-- **cPaaS 피드백 경유**: `cPaaS → server-api → participants UPDATE` — 클라이언트가 cPaaS를 통해 입장에 성공하면 입장 상태가 server-api로 전달되며, 퇴장·연결 끊김 이벤트도 동일 경로로 전달된다. server-api가 모든 참석자의 상태를 DB에 업데이트한다.
+- **cPaaS 피드백 경유**: `cPaaS → Meeting Manager → server-api (GET /entrance-info) → participants UPDATE` — 클라이언트가 cPaaS에 접속 성공하면 cPaaS가 입장 이벤트를 감지하여 Meeting Manager를 경유해 server-api의 GET /entrance-info API를 호출한다. server-api가 모든 참석자의 상태를 DB에 업데이트한다. 퇴장·연결 끊김 이벤트는 `cPaaS → server-api` 경로로 전달된다.
 
 ```mermaid
 flowchart TD
