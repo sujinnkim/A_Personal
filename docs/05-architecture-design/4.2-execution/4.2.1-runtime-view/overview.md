@@ -62,8 +62,10 @@ sequenceDiagram
     participant DA as domain.auth<br/>(AS-01)
     participant L1 as L1 Caffeine<br/>(AS-03, TTL 5분)
     participant L2 as L2 Redis<br/>(AS-03, TTL 30분~1h)
+    participant AC_INT as integration.ac<br/>(AS-10 ACL · AS-09 CB)
     participant CP_INT as integration.copilot<br/>(AS-10 ACL · AS-09 CB)
     participant EX as externalCallExecutor<br/>(AS-02 @Async)
+    participant ACS as AC서버
     participant CPS as Copilot Admin
 
     C->>CON: GET /members/{email}
@@ -85,10 +87,18 @@ sequenceDiagram
             DA-->>C: 응답
         else L2 miss
             L2-->>DA: miss
-            DA->>CP_INT: 외부 호출 요청 (AS-10 Gateway)
-            CP_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
-            EX->>CPS: Copilot Admin 비동기 호출 (AS-09 CB)
-            CPS-->>EX: 권한 데이터
+            par AC권한 조회
+                DA->>AC_INT: AC권한 조회 요청 (AS-10 Gateway)
+                AC_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
+                EX->>ACS: AC서버 비동기 호출 (AS-09 CB)
+                ACS-->>EX: AC 권한 데이터
+            and Copilot권한 조회
+                DA->>CP_INT: Copilot권한 조회 요청 (AS-10 Gateway)
+                CP_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
+                EX->>CPS: Copilot Admin 비동기 호출 (AS-09 CB)
+                CPS-->>EX: Copilot 권한 데이터
+            end
+            Note over EX: CompletableFuture.allOf() 수렴
             EX->>L1: L1 + L2 동시 적재 (AS-03)
             EX->>L2: L2 적재
             EX-->>C: CompletableFuture 완료 → 응답
@@ -103,6 +113,7 @@ sequenceDiagram
 | ThrottlingFilter | AS-05 | 피크 구간 비핵심 API 처리량 제한 (권한 갱신은 피크 구간 처리량 상한 적용) |
 | L1 Caffeine 조회 | AS-03 | 인스턴스 로컬 hit → 네트워크 없이 즉시 반환 |
 | L2 Redis 조회 | AS-03 | 분산 인스턴스 간 공유 캐시로 외부 서버 중복 호출 방지 |
+| AC·Copilot 병렬 호출 | AS-10 + AS-02 | AC권한·Copilot권한 CompletableFuture 병렬 조회 후 L1·L2 동시 적재 |
 | L1 + L2 동시 적재 | AS-03 | L2 miss 후 외부 호출 결과를 양 계층에 동시 적재 |
 
 ---

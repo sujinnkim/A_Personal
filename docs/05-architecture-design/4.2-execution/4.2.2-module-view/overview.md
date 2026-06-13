@@ -107,7 +107,7 @@ flowchart TD
 
     %% domain → integration 인터페이스 의존 (구현체 직접 참조 금지 — ArchUnit)
     DE -->|"인터페이스만 의존"| MM_GW
-    DA -->|"인터페이스만 의존"| CP_GW
+    DA -->|"인터페이스만 의존"| AC_GW & CP_GW
     DM -->|"인터페이스만 의존"| AC_GW
 
     %% integration 인터페이스 → 구현체

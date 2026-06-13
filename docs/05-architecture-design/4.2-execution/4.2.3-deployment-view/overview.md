@@ -84,8 +84,8 @@ flowchart TD
 
     %% domain → integration
     DE --> MM_INT
-    DA --> CP_INT
     DM --> AC_INT
+    DA --> AC_INT & CP_INT
 
     %% async
     MM_INT & AC_INT & CP_INT --> ASYNC
