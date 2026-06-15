@@ -1,18 +1,12 @@
 version: v0.1
-commit: e7c5453
-updated_at: 2026-06-08
+commit: c08c8bb
+updated_at: 2026-06-15
 synced_files:
   - report/1/1.0-시스템개요.md
-  - report/1/1.1-배경.md
   - report/1/1.2-이슈.md
   - report/1/1.3-설계목표.md
-  - report/1/1.4-고려사항및제약조건.md
-  - report/2/2.0-요구사항정의.md
-  - report/2/2.1-기능요구사항.md
   - report/2/2.2-품질요구사항.md
-  - report/2/2.3-아키텍처제약사항.md
-  - report/3/3.0-아키텍처문제분석.md
-  - report/3/3.1-아키텍처드라이버.md
   - report/3/3.2-아키텍처문제분석및설계전략.md
   - report/4/4.0-아키텍처상세설계.md
   - report/4/4.1-개념아키텍처.md
+  - report/4/4.2-실행뷰.md

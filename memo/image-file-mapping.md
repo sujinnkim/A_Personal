@@ -40,9 +40,6 @@
 | report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as09-alternative-1.png | 3.2-as09-alternative-1.drawio |
 | report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as09-alternative-2.png | 3.2-as09-alternative-2.drawio |
 | report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as09-alternative-3.png | 3.2-as09-alternative-3.drawio |
-| report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as10-alternative-1.png | 3.2-as10-alternative-1.drawio |
-| report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as10-alternative-2.png | 3.2-as10-alternative-2.drawio |
-| report/3/3.2-아키텍처문제분석및설계전략.md | 3.2-as10-alternative-3.png | 3.2-as10-alternative-3.drawio |
 | report/4/4.1-개념아키텍처.md | 4.1-tobe-architecture.png | 4.1-tobe-architecture.drawio |
 | report/4/4.2-실행뷰.md | 4.2-seq-uc04-join.png | 4.2-seq-uc04-join.drawio |
 | report/4/4.2-실행뷰.md | 4.2-seq-uc01-auth.png | 4.2-seq-uc01-auth.drawio |

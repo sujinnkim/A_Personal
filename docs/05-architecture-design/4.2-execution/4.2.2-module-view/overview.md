@@ -23,20 +23,20 @@ front-api/
       MeetingRepository.java (serviceDataSource 주입)
       MeetingQueryRepository.java (queryDataSource 주입, readOnly)
 
-  integration/             ← AS-10 ACL 연계 모듈 레이어
-    meetingManager/        ← AS-10 ACL + AS-09 CB
+  integration/             ← ACL 연계 모듈 레이어
+    meetingManager/        ← ACL + AS-09 CB
       MeetingManagerGateway.java     (포털 도메인이 의존하는 인터페이스)
       MeetingManagerFeignClient.java (외부 API 스키마 매핑)
       MeetingManagerAdapter.java     (DTO 변환 — 외부 모델 ↔ 포털 도메인)
       MeetingManagerCBConfig.java    (CB 정책: failureRate 50%, wait 10s)
       MeetingManagerFallback.java    (fail-fast → 오류 반환)
-    ac/                    ← AS-10 ACL + AS-09 CB
+    ac/                    ← ACL + AS-09 CB
       AcServerGateway.java
       AcServerFeignClient.java
       AcServerAdapter.java
       AcServerCBConfig.java          (CB 정책: failureRate 60%, wait 30s)
       AcServerFallback.java          (DB 저장 권한값 폴백)
-    copilot/               ← AS-10 ACL + AS-09 CB
+    copilot/               ← ACL + AS-09 CB
       CopilotAdminGateway.java
       CopilotFeignClient.java
       CopilotAdapter.java
@@ -80,7 +80,7 @@ flowchart TD
         DM["domain.meeting\nMeetingService"]
     end
 
-    subgraph INTEGRATION["integration.*  — AS-10 ACL 모듈"]
+    subgraph INTEGRATION["integration.*"]
         direction LR
         MM_GW["MeetingManagerGateway\n인터페이스"]
         AC_GW["AcServerGateway\n인터페이스"]

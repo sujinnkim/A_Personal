@@ -6,14 +6,14 @@
 
 ## 시나리오 1. UC-04 회의 입장 — 피크 집중 정상 처리
 
-피크 시간대 8만 명 동시 입장 요청을 AS-04·AS-02·AS-08·AS-10이 협력하여 처리하는 흐름이다.
+피크 시간대 8만 명 동시 입장 요청을 AS-04·AS-02·AS-08이 협력하여 처리하는 흐름이다.
 
 ```mermaid
 sequenceDiagram
     participant C as 클라이언트
     participant CON as 입장 전용 Connector<br/>(port 8081, AS-04)
     participant DE as domain.entry<br/>(AS-01)
-    participant MM_INT as integration.meetingManager<br/>(AS-10 ACL · AS-09 CB)
+    participant MM_INT as integration.meetingManager<br/>(AS-09 CB)
     participant EX as externalCallExecutor<br/>(AS-02 @Async)
     participant JP as join-pool<br/>(AS-08 Bulkhead)
     participant DB as MariaDB Primary
@@ -28,7 +28,7 @@ sequenceDiagram
     DB-->>JP: 결과 반환
     JP-->>DE: 커넥션 반환
 
-    DE->>MM_INT: 참석자 입장 정보 조회 요청 (AS-10 Gateway 인터페이스 호출)
+    DE->>MM_INT: 참석자 입장 정보 조회 요청
     MM_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
     Note over CON: AS-02: 서블릿 스레드 즉시 반환<br/>다음 요청 수용 가능
 
@@ -44,7 +44,7 @@ sequenceDiagram
 |-----|--------|------|
 | 입장 전용 Connector (port 8081) | AS-04 | 단순 조회·권한 갱신 요청과 스레드 경합 차단 |
 | domain.entry → join-pool | AS-08 | 입장 커넥션 고갈이 service-pool·general-pool에 전파되지 않음 |
-| integration.meetingManager Gateway | AS-10 | 포털 도메인 모델이 Meeting Manager API 스키마 직접 노출 차단 |
+| integration.meetingManager (ACL) | AS-09 | CB 장애 감지·fallback 및 포털 도메인 모델 Meeting Manager API 스키마 노출 차단 |
 | externalCallExecutor @Async | AS-02 | 서블릿 스레드 즉시 반환 → 8만 건 동시 요청 스레드 풀 고갈 방지 |
 | CB 상태 (Closed) | AS-09 | 정상 상태에서 Meeting Manager 직접 호출 |
 
@@ -62,8 +62,8 @@ sequenceDiagram
     participant DA as domain.auth<br/>(AS-01)
     participant L1 as L1 Caffeine<br/>(AS-03, TTL 5분)
     participant L2 as L2 Redis<br/>(AS-03, TTL 30분~1h)
-    participant AC_INT as integration.ac<br/>(AS-10 ACL · AS-09 CB)
-    participant CP_INT as integration.copilot<br/>(AS-10 ACL · AS-09 CB)
+    participant AC_INT as integration.ac<br/>(AS-09 CB)
+    participant CP_INT as integration.copilot<br/>(AS-09 CB)
     participant EX as externalCallExecutor<br/>(AS-02 @Async)
     participant ACS as AC서버
     participant CPS as Copilot Admin
@@ -88,13 +88,11 @@ sequenceDiagram
         else L2 miss
             L2-->>DA: miss
             par AC권한 조회
-                DA->>AC_INT: AC권한 조회 요청 (AS-10 Gateway)
-                AC_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
+                DA->>AC_INT: AC권한 조회 요청                AC_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
                 EX->>ACS: AC서버 비동기 호출 (AS-09 CB)
                 ACS-->>EX: AC 권한 데이터
             and Copilot권한 조회
-                DA->>CP_INT: Copilot권한 조회 요청 (AS-10 Gateway)
-                CP_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
+                DA->>CP_INT: Copilot권한 조회 요청                CP_INT->>EX: @Async("externalCallExecutor") 위임 (AS-02)
                 EX->>CPS: Copilot Admin 비동기 호출 (AS-09 CB)
                 CPS-->>EX: Copilot 권한 데이터
             end
@@ -113,7 +111,7 @@ sequenceDiagram
 | ThrottlingFilter | AS-05 | 피크 구간 비핵심 API 처리량 제한 (권한 갱신은 피크 구간 처리량 상한 적용) |
 | L1 Caffeine 조회 | AS-03 | 인스턴스 로컬 hit → 네트워크 없이 즉시 반환 |
 | L2 Redis 조회 | AS-03 | 분산 인스턴스 간 공유 캐시로 외부 서버 중복 호출 방지 |
-| AC·Copilot 병렬 호출 | AS-10 + AS-02 | AC권한·Copilot권한 CompletableFuture 병렬 조회 후 L1·L2 동시 적재 |
+| AC·Copilot 병렬 호출 | AS-09 + AS-02 | AC권한·Copilot권한 CompletableFuture 병렬 조회 후 L1·L2 동시 적재 |
 | L1 + L2 동시 적재 | AS-03 | L2 miss 후 외부 호출 결과를 양 계층에 동시 적재 |
 
 ---
@@ -202,12 +200,12 @@ sequenceDiagram
 sequenceDiagram
     participant C as 클라이언트
     participant DE as domain.entry
-    participant MM_INT as integration.meetingManager<br/>(AS-10 ACL)
+    participant MM_INT as integration.meetingManager
     participant CB_MM as wcServer CircuitBreaker<br/>(AS-09, failureRate 50%, wait 10s)
     participant MM as Meeting Manager
 
     participant DA as domain.auth
-    participant CP_INT as integration.copilot<br/>(AS-10 ACL)
+    participant CP_INT as integration.copilot
     participant CB_CP as copilotAdmin CircuitBreaker<br/>(AS-09, failureRate 70%, wait 60s)
     participant L2 as L2 Redis<br/>(AS-03)
     participant DB_F as MariaDB<br/>(DB 폴백)
@@ -251,4 +249,4 @@ sequenceDiagram
 | wcServer CB Open → fail-fast | AS-09 | Meeting Manager 장애 시 timeout 없이 즉시 거부 → 스레드 블로킹 방지 |
 | copilotAdmin CB Open → L2 Redis 폴백 | AS-09 + AS-03 | Copilot Admin 장애 시 캐시 기반 계층적 복구 |
 | DB 저장값 최종 폴백 | AS-09 | L2 miss 시 DB 저장 권한값으로 서비스 연속성 유지 |
-| 서버별 독립 CB 정책 | AS-09 + AS-10 | WC서버(50%, 10s) vs Copilot Admin(70%, 60s) 차등 적용 |
+| 서버별 독립 CB 정책 | AS-09 | WC서버(50%, 10s) vs Copilot Admin(70%, 60s) 차등 적용 |

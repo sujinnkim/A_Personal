@@ -122,7 +122,7 @@ flowchart TD
     style PRIMARY fill:#ffcc99,color:#000
     style REPLICA fill:#d4edda,color:#000
 ```
-<!-- 이미지 파일명(draw.io → PNG 교체 시): report/images/3.2-as08-cqrs-routing.png -->
+<!-- 이미지 파일명(draw.io → PNG 교체 시): report/images/3.2-as07-cqrs-routing.png -->
 <p align="center"><em>[그림 AS08-1] Primary(write) · Replica(read) 분리 라우팅 구조</em></p>
 
 ## 채택

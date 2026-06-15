@@ -34,7 +34,7 @@ flowchart TD
                 DM["domain.meeting"]
             end
 
-            subgraph INTEGRATION_LAYER["integration.*  AS-10 ACL"]
+            subgraph INTEGRATION_LAYER["integration.*"]
                 MM_INT["integration.meetingManager\nAS-09 CB"]
                 AC_INT["integration.ac\nAS-09 CB"]
                 CP_INT["integration.copilot\nAS-09 CB"]
