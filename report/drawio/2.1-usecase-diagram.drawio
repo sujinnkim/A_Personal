@@ -1,0 +1,120 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="usecase-diagram" name="usecase-diagram">
+    <mxGraphModel dx="3290" dy="1238" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MeetingPortal" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=20;fontStyle=1;verticalAlign=top;spacingTop=14;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;font&gt;미팅 포털 서버&lt;/font&gt;" vertex="1">
+          <mxGeometry height="870" width="740" x="110" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Clients" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=4;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=none;strokeColor=#82b366;" value="미팅 클라이언트" vertex="1">
+          <mxGeometry height="260" width="270" x="-264" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="Batch" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=16;fontStyle=1;rounded=1;align=center;verticalAlign=middle;" value="배치 시스템&lt;div&gt;(내부 스케쥴러)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="200.5" x="609.5" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="AuthServer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=16;fontStyle=1;" value="권한 서버&lt;br&gt;AC / Copilot Admin" vertex="1">
+          <mxGeometry height="110" width="190" x="-224" y="151.5" as="geometry" />
+        </mxCell>
+        <mxCell id="VendorServers" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=16;fontStyle=1;" value="회의 서버&lt;br&gt;WC / VC / AC" vertex="1">
+          <mxGeometry height="230" width="170" x="930" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="InServer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=16;fontStyle=1;" value="IN서버·메일·push" vertex="1">
+          <mxGeometry height="110" width="190" x="920" y="151.5" as="geometry" />
+        </mxCell>
+        <mxCell id="UC01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-01&lt;br&gt;사용자 권한 갱신" vertex="1">
+          <mxGeometry height="80" width="162" x="210" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="UC02" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-02&lt;br&gt;회의 예약" vertex="1">
+          <mxGeometry height="80" width="162" x="344" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="UC06" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-06&lt;br&gt;참석자 초대" vertex="1">
+          <mxGeometry height="80" width="162" x="210" y="166.5" as="geometry" />
+        </mxCell>
+        <mxCell id="UC03" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-03&lt;br&gt;회의 시작" vertex="1">
+          <mxGeometry height="80" width="162" x="399" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="UC04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-04&lt;br&gt;회의 입장" vertex="1">
+          <mxGeometry height="80" width="162" x="210" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="UC05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;" value="UC-05&lt;br&gt;회의 퇴장" vertex="1">
+          <mxGeometry height="80" width="162" x="570" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="UC07" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-07&lt;br&gt;회의 종료" vertex="1">
+          <mxGeometry height="80" width="162" x="344" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="UC08" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=17;fontStyle=1;fontColor=default;align=center;verticalAlign=middle;" value="UC-08&lt;br&gt;알림 발송" vertex="1">
+          <mxGeometry height="80" width="162" x="570" y="166.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC01">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC02">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC03">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC04">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC06">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="Clients" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="UC07">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="UC02" style="endArrow=open;html=1;rounded=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontFamily=Malgun Gothic;fontSize=16;" target="UC03" value="예약 기반">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="Batch" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;" target="UC03" value="예약 시각 자동 트리거">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="Batch" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;" target="UC07" value="예약 시각 자동 종료">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="a2O6u-vghGyBG9bhwuoz-8" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="UC05" value="퇴장 이벤트">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="919.9999999999818" y="850" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="UC01" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;" target="AuthServer" value="권한 갱신">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="UC03" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;entryX=-0.01;entryY=0.154;entryDx=0;entryDy=0;entryPerimeter=0;" target="VendorServers" value="회의 개설 요청">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="UC07" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=16;entryX=0.01;entryY=0.857;entryDx=0;entryDy=0;entryPerimeter=0;" target="VendorServers" value="회의 종료 요청">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="852.2800000000002" y="702.3100000000002" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="UC03" style="endArrow=open;html=1;rounded=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontFamily=Malgun Gothic;fontSize=16;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="UC01" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="UC03" style="endArrow=open;html=1;rounded=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontFamily=Malgun Gothic;fontSize=16;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="UC08" value="«extend»&lt;br&gt;(알림 옵션 시)">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="536.5720746844604" y="303.8595616346888" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="UC06" style="endArrow=open;html=1;rounded=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;fontFamily=Malgun Gothic;fontSize=16;" target="UC08" value="«extend»&lt;br&gt;(알림 옵션 시)">
+          <mxGeometry relative="1" x="-0.0104" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="UC08" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;" target="InServer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2O6u-vghGyBG9bhwuoz-2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontStyle=0;fontSize=16;strokeWidth=2;" value="웹포탈&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="60" x="-211" y="459.5" as="geometry" />
+        </mxCell>
+        <mxCell id="a2O6u-vghGyBG9bhwuoz-5" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontStyle=0;fontSize=16;strokeWidth=2;" value="모바일 앱&lt;div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="60" x="-107" y="459.5" as="geometry" />
+        </mxCell>
+        <mxCell id="a2O6u-vghGyBG9bhwuoz-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=16;fontStyle=1;" value="cPaaS 서버" vertex="1">
+          <mxGeometry height="110" width="190" x="920" y="795" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

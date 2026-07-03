@@ -1,0 +1,310 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="meeting-portal-architecture" name="meeting-portal-architecture">
+    <mxGraphModel dx="1848" dy="929" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="CLIENT_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#f5f5f5;strokeColor=#a6a6a6;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;클라이언트&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="650" x="70" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ROUTING_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#fff8cc;strokeColor=#d6b656;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;AS-04  요청 우선순위 분기&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="660" x="65" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="FRONTAPI" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;front-api&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="373" width="660" x="65" y="287" as="geometry" />
+        </mxCell>
+        <mxCell id="CACHE_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=bottom;spacingTop=10;fillColor=#d5e8d4;strokeColor=#82b366;" value="AS-03  캐시 계층" vertex="1">
+          <mxGeometry height="92" width="370" x="350" y="697" as="geometry" />
+        </mxCell>
+        <mxCell id="BULKHEAD_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;AS-08  HikariCP Bulkhead&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="657.5" x="60" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="DB_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#f8cecc;strokeColor=#b85450;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;MariaDB  ·  AS-07  CQRS&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="380" x="340" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="EXT_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=bottom;spacingTop=10;fillColor=#e1d5e7;strokeColor=#9673a6;" value="외부 서버" vertex="1">
+          <mxGeometry height="89" width="250" x="69" y="701" as="geometry" />
+        </mxCell>
+        <mxCell id="FEEDBACK_LAYER" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;cPaaS 피드백 흐름  역방향&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="250" x="59" y="925" as="geometry" />
+        </mxCell>
+        <mxCell id="WEB" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#666666;" value="미팅 웹포탈 · 모바일 앱" vertex="1">
+          <mxGeometry height="30" width="250" x="275" y="99" as="geometry" />
+        </mxCell>
+        <mxCell id="JOIN_C" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#fff2cc;strokeColor=#d6b656;" value="입장 전용 Connector&lt;br&gt;port 8081 · 전용 스레드 풀&lt;br&gt;/join · /conference-token" vertex="1">
+          <mxGeometry height="45" width="250" x="135" y="211" as="geometry" />
+        </mxCell>
+        <mxCell id="GEN_C" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#fff2cc;strokeColor=#d6b656;" value="일반 Connector&lt;br&gt;port 8080&lt;br&gt;조회 · 권한 갱신 · 관리" vertex="1">
+          <mxGeometry height="45" width="235" x="430" y="211" as="geometry" />
+        </mxCell>
+        <mxCell id="THROT" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#fff2cc;strokeColor=#d6b656;" value="AS-05  Throttling Filter&lt;br&gt;피크 구간 중 비핵심 API 처리량 제한" vertex="1">
+          <mxGeometry height="45" width="240" x="440" y="312" as="geometry" />
+        </mxCell>
+        <mxCell id="DOMAIN_BOX" parent="1" style="rounded=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=7;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;spacingTop=8;html=1;whiteSpace=wrap;" value="&lt;div style=&quot;line-height: 0%;&quot;&gt;AS-01  도메인 모듈 레이어&lt;/div&gt;" vertex="1">
+          <mxGeometry height="81" width="575" x="110" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="ENTRY" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="domain.entry&lt;br&gt;입장 처리" vertex="1">
+          <mxGeometry height="35" width="130" x="142" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="AUTH_D" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="domain.auth&lt;br&gt;권한 갱신" vertex="1">
+          <mxGeometry height="35" width="130" x="335" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="MEET" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="domain.meeting&lt;br&gt;회의 관리" vertex="1">
+          <mxGeometry height="35" width="130" x="535" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="ACL_BOX" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;strokeWidth=2;fontFamily=Malgun Gothic;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=10;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;spacingTop=8;" value="&lt;div style=&quot;line-height: 20%;&quot;&gt;ACL 연계 모듈 레이어&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="575" x="110" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="MM_INT" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#e1d5e7;strokeColor=#9673a6;" value="integration.meetingManager&lt;br&gt;AS-09 CB · Fallback" vertex="1">
+          <mxGeometry height="30" width="165" x="125" y="513" as="geometry" />
+        </mxCell>
+        <mxCell id="AC_INT" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#e1d5e7;strokeColor=#9673a6;" value="integration.ac&lt;br&gt;AS-09 CB · Fallback" vertex="1">
+          <mxGeometry height="30" width="145" x="320" y="513" as="geometry" />
+        </mxCell>
+        <mxCell id="CP_INT" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#e1d5e7;strokeColor=#9673a6;" value="integration.copilot&lt;br&gt;AS-09 CB · Fallback" vertex="1">
+          <mxGeometry height="30" width="165" x="495" y="513" as="geometry" />
+        </mxCell>
+        <mxCell id="L1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#82b366;" value="L1 Caffeine&lt;br&gt;인스턴스 로컬 · TTL 5분" vertex="1">
+          <mxGeometry height="35" width="115" x="386" y="729" as="geometry" />
+        </mxCell>
+        <mxCell id="L2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#82b366;" value="L2 Redis&lt;br&gt;분산 공유 · TTL 30분~1시간" vertex="1">
+          <mxGeometry height="35" width="115" x="573" y="729" as="geometry" />
+        </mxCell>
+        <mxCell id="JP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;" value="join-pool&lt;br&gt;50 conn" vertex="1">
+          <mxGeometry height="35" width="120" x="120" y="849" as="geometry" />
+        </mxCell>
+        <mxCell id="SP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;" value="service-pool&lt;br&gt;30 conn" vertex="1">
+          <mxGeometry height="35" width="120" x="415" y="849" as="geometry" />
+        </mxCell>
+        <mxCell id="GP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;" value="general-pool&lt;br&gt;30 conn" vertex="1">
+          <mxGeometry height="35" width="120" x="265" y="849" as="geometry" />
+        </mxCell>
+        <mxCell id="QP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#d79b00;" value="query-pool  Read 전용&lt;br&gt;30 conn" vertex="1">
+          <mxGeometry height="35" width="140" x="552" y="849" as="geometry" />
+        </mxCell>
+        <mxCell id="PRI" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#b85450;" value="Primary&lt;br&gt;Write" vertex="1">
+          <mxGeometry height="50" width="120" x="380" y="970" as="geometry" />
+        </mxCell>
+        <mxCell id="REP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#b85450;" value="Replica&lt;br&gt;Read" vertex="1">
+          <mxGeometry height="50" width="120" x="550" y="970" as="geometry" />
+        </mxCell>
+        <mxCell id="MM" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#9673a6;" value="Meeting Manager" vertex="1">
+          <mxGeometry height="32" width="60" x="90" y="725.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ACS" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#9673a6;" value="AC서버" vertex="1">
+          <mxGeometry height="32" width="60" x="168" y="725.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CPS" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#9673a6;" value="Copilot Admin" vertex="1">
+          <mxGeometry height="32" width="60" x="243" y="725.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CPAAS" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#9673a6;" value="cPaaS" vertex="1">
+          <mxGeometry height="30" width="170" x="99" y="959" as="geometry" />
+        </mxCell>
+        <mxCell id="SAPI" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#9673a6;" value="server-api" vertex="1">
+          <mxGeometry height="30" width="170" x="99" y="1009" as="geometry" />
+        </mxCell>
+        <mxCell id="E1" edge="1" parent="1" source="WEB" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;" target="JOIN_C" value="입장 요청">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E2" edge="1" parent="1" source="WEB" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;" target="GEN_C" value="일반 요청">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="535" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E3" edge="1" parent="1" source="JOIN_C" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.287;exitY=0.972;exitDx=0;exitDy=0;exitPerimeter=0;" target="ENTRY" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="E4" edge="1" parent="1" source="GEN_C" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.554;exitY=1.011;exitDx=0;exitDy=0;exitPerimeter=0;" target="THROT" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="E5" edge="1" parent="1" source="THROT" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="AUTH_D" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="424" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E6" edge="1" parent="1" source="THROT" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="MEET" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="424" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E7" edge="1" parent="1" source="AUTH_D" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="L1" value="L1 조회">
+          <mxGeometry relative="1" x="-0.9624" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="400" y="470" />
+              <mxPoint x="50" y="470" />
+              <mxPoint x="50" y="670" />
+              <mxPoint x="444" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E8" edge="1" parent="1" source="L1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;" target="L2" value="L1 miss">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="E9" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="578" y="580" />
+              <mxPoint x="391" y="580" />
+            </Array>
+            <mxPoint x="578" y="570" as="sourcePoint" />
+            <mxPoint x="390.5" y="543" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E10" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;" value="L2 miss → 외부 호출 후 적재">
+          <mxGeometry relative="1" x="0.7721" y="178" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="660" y="580" />
+              <mxPoint x="578" y="580" />
+            </Array>
+            <mxPoint x="659.9999999999998" y="729" as="sourcePoint" />
+            <mxPoint x="577.9999999999999" y="539" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-11" connectable="0" parent="E10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;span style=&quot;font-family: &amp;quot;Malgun Gothic&amp;quot;; font-size: 10px;&quot;&gt;L2 miss → 외부 호출 후 적재&lt;/span&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.8354" as="geometry">
+            <mxPoint y="6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E11" edge="1" parent="1" source="PREWARM" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="L2" value="선제 적재">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="505" y="670" />
+              <mxPoint x="631" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E17" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="MM" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="680" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E19" edge="1" parent="1" source="ASYNC" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.44;entryY=0.01;entryDx=0;entryDy=0;entryPerimeter=0;" target="CPS" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="198" y="638" />
+              <mxPoint x="198" y="680" />
+              <mxPoint x="269" y="680" />
+            </Array>
+            <mxPoint x="270" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E20" edge="1" parent="1" source="ENTRY" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="JP" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="424" />
+              <mxPoint x="20" y="858" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E21" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="SP" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="800" />
+              <mxPoint x="475" y="800" />
+            </Array>
+            <mxPoint x="740" y="800" as="sourcePoint" />
+            <mxPoint x="475" y="860" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E22" edge="1" parent="1" source="AUTH_D" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.198;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;exitPerimeter=0;" target="GP" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="361" y="460" />
+              <mxPoint x="40" y="460" />
+              <mxPoint x="40" y="800" />
+              <mxPoint x="295" y="800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E23" edge="1" parent="1" source="MEET" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="QP" value="readOnly 조회">
+          <mxGeometry relative="1" x="0.9397" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="740" y="424" />
+              <mxPoint x="740" y="800" />
+              <mxPoint x="610" y="800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E24" edge="1" parent="1" source="JP" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.464;exitY=1.013;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="PRI" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="176" y="915" />
+              <mxPoint x="440" y="915" />
+            </Array>
+            <mxPoint x="176" y="903" as="sourcePoint" />
+            <mxPoint x="435" y="1057" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="E28" edge="1" parent="1" source="CPAAS" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;" target="SAPI" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="E29" edge="1" parent="1" source="SAPI" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="JP" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ASYNC" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#f8cecc;strokeColor=#b85450;" value="AS-02  AsyncTaskExecutor&lt;br&gt;외부 호출 전용 스레드 풀" vertex="1">
+          <mxGeometry height="45" width="180" x="110" y="592.5" as="geometry" />
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-4" edge="1" parent="1" source="ACL_BOX" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.156;exitY=1.001;exitDx=0;exitDy=0;exitPerimeter=0;" target="ASYNC" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="531" as="sourcePoint" />
+            <mxPoint x="517" y="731" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-5" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=1.5;" target="GP" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="325" y="915" as="sourcePoint" />
+            <mxPoint x="410" y="965" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-6" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=1.5;" target="SP" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="475" y="915" />
+            </Array>
+            <mxPoint x="350" y="915" as="sourcePoint" />
+            <mxPoint x="420" y="865" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PREWARM" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#82b366;" value="AS-06  Pre-warming Scheduler&lt;br&gt;예약 회의 기반 동적 워밍&lt;br&gt;피크 N분 전 L2 선제 적재" vertex="1">
+          <mxGeometry height="55" width="250" x="380" y="592.5" as="geometry" />
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-14" edge="1" parent="1" source="QP" style="endArrow=block;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeColor=default;strokeWidth=1.5;align=center;verticalAlign=middle;fontFamily=Malgun Gothic;fontSize=10;fontColor=default;labelBackgroundColor=default;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="452" y="965" as="sourcePoint" />
+            <mxPoint x="622" y="970" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-17" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;fontFamily=Malgun Gothic;fontSize=10;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ACS" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="197.89" y="680.5" as="sourcePoint" />
+            <mxPoint x="197.89" y="739.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-18" connectable="0" parent="8WQL91FZoYu19YgsvDAp-17" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="비동기 호출" vertex="1">
+          <mxGeometry relative="1" x="-0.7387" y="-1" as="geometry">
+            <mxPoint y="4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-19" connectable="0" parent="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="비동기 호출" vertex="1">
+          <mxGeometry x="119" y="691" as="geometry" />
+        </mxCell>
+        <mxCell id="8WQL91FZoYu19YgsvDAp-20" connectable="0" parent="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="비동기 호출" vertex="1">
+          <mxGeometry x="269" y="691" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

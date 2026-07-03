@@ -1,0 +1,35 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="package-separation" id="0">
+    <mxGraphModel dx="1232" dy="619" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1450" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pkg" parent="1" style="rounded=0;fillColor=#d9d9d9;strokeColor=#b7b7b7;fontStyle=1;verticalAlign=top;spacingTop=4;html=1;" value="패키지 분리됨 (컨벤션)" vertex="1">
+          <mxGeometry height="120" width="400" x="402" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="domain" parent="1" style="rounded=0;fillColor=#f4f0ff;strokeColor=#a98bff;html=1;" value="domain.*&lt;br&gt;(conference·auth·member)" vertex="1">
+          <mxGeometry height="65" width="155" x="423" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" style="rounded=0;fillColor=#f4f0ff;strokeColor=#a98bff;html=1;" value="api.*&lt;br&gt;(meetingmanager·copilot·ac)" vertex="1">
+          <mxGeometry height="65" width="170" x="613" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="ds" parent="1" style="rounded=0;fillColor=#ff9999;strokeColor=#cc6666;fontStyle=1;html=1;" value="단일 HikariCP DataSource&lt;br&gt;(모든 도메인 공유)" vertex="1">
+          <mxGeometry height="65" width="180" x="870" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;" target="ds">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="803" y="371.40056022408965" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="ds" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1110" y="372.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kwMW07DjWs5IoDJV6IC7-1" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#eeeeee;strokeColor=#36393d;" value="MariaDB" vertex="1">
+          <mxGeometry height="70" width="75" x="1110" y="340" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

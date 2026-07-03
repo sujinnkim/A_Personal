@@ -1,7 +1,7 @@
 function colorAllHeadings() {
     // ===== 사용자 설정 (함수 내부) =====
     const DOC_ID            = '1urPdY1X8TuJHF52FI-KJX-jlGRbSrw18F0lIcUUyZEE';
-    const COLOR_HEX         = '#4f81bd';
+    const COLOR_HEX         = '#080808';
     const TARGET_LEVELS     = /^HEADING_[1-6]$/;   // H1 ~ H6 (변경 가능)
     const SKIP_BEFORE_BODY  = true;                // 표지·Revision History·TOC 보호
     const LEVEL_FONT_SIZE   = { HEADING_4: 12, HEADING_5: 11 };   // 레벨별 글자 크기(pt). 미지정 레벨은 크기 변경 안 함

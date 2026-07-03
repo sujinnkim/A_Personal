@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="3.2-as01-alternative-3" id="0">
+    <mxGraphModel dx="1232" dy="619" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1450" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dombox" parent="1" style="rounded=0;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Malgun Gothic;fontSize=12;html=1;verticalAlign=top;" value="domain.* (단일 코드베이스)" vertex="1">
+          <mxGeometry height="290" width="190" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="entry" parent="1" style="rounded=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="domain.entry" vertex="1">
+          <mxGeometry height="38" width="120" x="55" y="104" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" parent="1" style="rounded=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="domain.auth" vertex="1">
+          <mxGeometry height="38" width="120" x="55" y="174" as="geometry" />
+        </mxCell>
+        <mxCell id="meeting" parent="1" style="rounded=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="domain.meeting" vertex="1">
+          <mxGeometry height="38" width="120" x="55" y="244" as="geometry" />
+        </mxCell>
+        <mxCell id="intbox" parent="1" style="rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Malgun Gothic;fontSize=12;html=1;verticalAlign=top;" value="integration.*" vertex="1">
+          <mxGeometry height="90" width="510" x="260" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="wc" parent="1" style="rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="integration.wc" vertex="1">
+          <mxGeometry height="40" width="120" x="295" y="47" as="geometry" />
+        </mxCell>
+        <mxCell id="ac" parent="1" style="rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="integration.ac" vertex="1">
+          <mxGeometry height="40" width="120" x="450" y="47" as="geometry" />
+        </mxCell>
+        <mxCell id="cop" parent="1" style="rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Malgun Gothic;fontSize=12;html=1;" value="integration.copilot" vertex="1">
+          <mxGeometry height="40" width="150" x="590" y="47" as="geometry" />
+        </mxCell>
+        <mxCell id="mariadb" parent="1" style="shape=cylinder;fillColor=#f5f5f5;strokeColor=#666666;fontFamily=Malgun Gothic;fontSize=12;html=1;fontColor=#333333;" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;MariaDB&lt;br&gt;기능별 독립 풀" vertex="1">
+          <mxGeometry height="95" width="120" x="280" y="146.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="dombox" style="endArrow=block;html=1;strokeWidth=1.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.996;exitY=0.154;exitDx=0;exitDy=0;exitPerimeter=0;" target="intbox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="entry" style="endArrow=block;html=1;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="auth" style="endArrow=block;html=1;strokeWidth=1.5;" target="mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="meeting" style="endArrow=block;html=1;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
