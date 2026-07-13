@@ -1,0 +1,112 @@
+### stub.http — Stub 장애 주입/복구 제어 API (IV-04용)
+### Stub Server: http://localhost:8090
+### IV-04: 외부 서버 장애 주입 시 핵심 기능 성공률 99.9% 이상
+
+@stubUrl = http://localhost:8090
+
+### ─── Stub 상태 확인 ────────────────────────────────────────────
+
+### ① 전체 Stub 장애 상태 조회
+GET {{stubUrl}}/stub/status
+
+### ─── Meeting Manager 장애 주입 ─────────────────────────────────
+
+### ② Meeting Manager — 즉시 503 오류 주입 (errorMode=true)
+# CB failureRate=50%, 5~6회 실패 후 OPEN 상태 진입
+POST {{stubUrl}}/stub/meeting-manager/fault
+Content-Type: application/json
+
+{
+  "delayMs": 0,
+  "errorMode": true
+}
+
+### ③ Meeting Manager — 지연 주입 (5초 지연, 오류 없음)
+# TimeLimiter(3s) 초과 → CB에 timeout으로 기록
+POST {{stubUrl}}/stub/meeting-manager/fault
+Content-Type: application/json
+
+{
+  "delayMs": 5000,
+  "errorMode": false
+}
+
+### ④ Meeting Manager — 장애 해제 (정상 복구)
+DELETE {{stubUrl}}/stub/meeting-manager/fault
+
+### ─── AC서버 장애 주입 ────────────────────────────────────────────
+
+### ⑤ AC서버 — 즉시 503 오류 주입
+# CB failureRate=60%, wait=30s → fallback: DB 저장 acRole 반환
+POST {{stubUrl}}/stub/ac/fault
+Content-Type: application/json
+
+{
+  "delayMs": 0,
+  "errorMode": true
+}
+
+### ⑥ AC서버 — 지연 주입 (4초)
+POST {{stubUrl}}/stub/ac/fault
+Content-Type: application/json
+
+{
+  "delayMs": 4000,
+  "errorMode": false
+}
+
+### ⑦ AC서버 — 장애 해제
+DELETE {{stubUrl}}/stub/ac/fault
+
+### ─── Copilot Admin 장애 주입 ────────────────────────────────────
+
+### ⑧ Copilot Admin — 즉시 503 오류 주입
+# CB failureRate=70%, wait=60s → fallback: L2 Redis → DB 계층적 폴백
+POST {{stubUrl}}/stub/copilot/fault
+Content-Type: application/json
+
+{
+  "delayMs": 0,
+  "errorMode": true
+}
+
+### ⑨ Copilot Admin — 장애 해제
+DELETE {{stubUrl}}/stub/copilot/fault
+
+### ─── 전체 장애 해제 (복구) ─────────────────────────────────────
+
+### ⑩ Meeting Manager 해제
+DELETE {{stubUrl}}/stub/meeting-manager/fault
+
+### ⑪ AC서버 해제
+DELETE {{stubUrl}}/stub/ac/fault
+
+### ⑫ Copilot 해제
+DELETE {{stubUrl}}/stub/copilot/fault
+
+### ─── Circuit Breaker 상태 확인 ─────────────────────────────────
+
+### ⑬ CB 상태 (Actuator health에서 circuitBreakers 확인)
+GET http://localhost:8080/actuator/health
+
+### ⑭ Resilience4j CB 이벤트 (circuit breaker 상태 전이 확인)
+# meetingManager, acServer, copilotAdmin 상태 조회
+GET http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.state?tag=name:meetingManager
+
+### ─── 장애 주입 → 검증 순서 안내 ────────────────────────────────
+### IV-04 수동 검증 절차:
+###
+### 1. GET {{stubUrl}}/stub/status             → 초기 상태 정상 확인
+### 2. POST {{stubUrl}}/stub/meeting-manager/fault (errorMode=true)
+### 3. POST http://localhost/meetings/1/join   → 성공 확인 (LOCAL 토큰)
+###    GET  http://localhost/meetings/1/conference-token?email=test@example.com
+###    → CB OPEN 후에도 임시 토큰으로 응답해야 함
+### 4. DELETE {{stubUrl}}/stub/meeting-manager/fault  → 복구
+### 5. POST {{stubUrl}}/stub/ac/fault (errorMode=true)
+### 6. GET  http://localhost/members/user1@example.com?type=detail
+###    → acRole이 DB 저장값으로 반환되어야 함
+### 7. DELETE {{stubUrl}}/stub/ac/fault        → 복구
+### 8. POST {{stubUrl}}/stub/copilot/fault (errorMode=true)
+### 9. GET  http://localhost/members/user1@example.com?type=detail
+###    → copilotEnabled가 Redis(L2) 또는 DB 값으로 반환되어야 함
+### 10. DELETE {{stubUrl}}/stub/copilot/fault  → 최종 복구

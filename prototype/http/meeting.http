@@ -1,0 +1,119 @@
+### meeting.http — 회의 관리 API 테스트 (Port 8080)
+### IV-01: 부하 중 회의 조회 응답시간 확인
+### IV-02: join-pool 고갈 시 회의 조회(service-pool) 독립 동작 확인
+
+@baseUrl = http://localhost
+@servicePort = http://localhost:8080
+@meetingId = 1
+
+### ─── 회의 예약 ────────────────────────────────────────────────
+
+### ① 회의 예약 — ServicePool 사용
+POST {{baseUrl}}/meetings
+Content-Type: application/json
+
+{
+  "title": "커넥션 풀 분리 검증 회의",
+  "organizerEmail": "organizer1@example.com",
+  "scheduledAt": "2026-07-01T14:00:00"
+}
+
+### ② 회의 예약 — 다수 예약 테스트
+POST {{baseUrl}}/meetings
+Content-Type: application/json
+
+{
+  "title": "Circuit Breaker 검증 회의",
+  "organizerEmail": "organizer2@example.com",
+  "scheduledAt": "2026-07-01T15:00:00"
+}
+
+### ─── 회의 조회 ────────────────────────────────────────────────
+
+### ③ 회의 조회 — QueryPool(Replica) 사용, readOnly=true
+# IV-02 핵심: join-pool 포화 중에도 이 API는 100% 성공해야 함
+GET {{baseUrl}}/meetings/{{meetingId}}
+
+### ④ 회의 조회 — 직접 서비스 포트
+GET {{servicePort}}/meetings/1
+
+### ⑤ 존재하지 않는 회의 조회 (404 확인)
+GET {{baseUrl}}/meetings/99999
+
+### ─── 회의 시작 ────────────────────────────────────────────────
+
+### ⑥ 회의 시작 — ServicePool + Meeting Manager 알림 (AS-09 CB)
+POST {{baseUrl}}/meetings/{{meetingId}}/start
+
+### ⑦ 회의 시작 — 다른 회의
+POST {{baseUrl}}/meetings/4/start
+
+### ─── 참석자 초대 ─────────────────────────────────────────────
+
+### ⑧ 참석자 초대 — ServicePool 사용
+POST {{baseUrl}}/meetings/{{meetingId}}/participants
+Content-Type: application/json
+
+{
+  "email": "newparticipant@example.com"
+}
+
+### ⑨ 다수 참석자 초대
+POST {{baseUrl}}/meetings/{{meetingId}}/participants
+Content-Type: application/json
+
+{"email": "participant-a@example.com"}
+
+###
+POST {{baseUrl}}/meetings/{{meetingId}}/participants
+Content-Type: application/json
+
+{"email": "participant-b@example.com"}
+
+### ─── 참석자 상태 피드백/조회 (ISSUE-07 / AS-07) ──────────────
+# cPaaS 피드백을 시뮬레이션: 상태 변경(write, ServicePool) / 상태 조회(read, Replica QueryPool)
+
+### ⑮ 입장 성공 피드백 — 참석자 상태 JOINED (write, ServicePool → Primary)
+POST {{baseUrl}}/meetings/{{meetingId}}/feedback/entrance
+Content-Type: application/json
+
+{"email": "participant1@example.com"}
+
+### ⑯ 셀프 참석자 입장 피드백 — 사전 초대 없이 입장 시 레코드 생성 + JOINED
+POST {{baseUrl}}/meetings/{{meetingId}}/feedback/entrance
+Content-Type: application/json
+
+{"email": "self-user@example.com"}
+
+### ⑰ 퇴장 피드백 — 참석자 상태 LEFT (write)
+POST {{baseUrl}}/meetings/{{meetingId}}/feedback/leave
+Content-Type: application/json
+
+{"email": "participant2@example.com", "disconnected": "false"}
+
+### ⑱ 연결 끊김 피드백 — 참석자 상태 DISCONNECTED (write)
+POST {{baseUrl}}/meetings/{{meetingId}}/feedback/leave
+Content-Type: application/json
+
+{"email": "participant3@example.com", "disconnected": "true"}
+
+### ⑲ 참석자 상태 조회 — Replica(QueryPool) 라우팅, readOnly
+# IV-05 핵심: 피드백 write 집중 중에도 이 조회는 Replica에서 독립 동작
+GET {{baseUrl}}/meetings/{{meetingId}}/participants/status
+
+### ─── HikariCP 풀별 커넥션 현황 ─────────────────────────────
+
+### ⑩ ServicePool 활성 커넥션 (maximumPoolSize=40)
+GET {{servicePort}}/actuator/metrics/hikaricp.connections.active?tag=pool:ServicePool
+
+### ⑪ QueryPool 활성 커넥션 (maximumPoolSize=80, Replica)
+GET {{servicePort}}/actuator/metrics/hikaricp.connections.active?tag=pool:QueryPool
+
+### ⑫ JoinPool 활성 커넥션 (maximumPoolSize=100)
+GET {{servicePort}}/actuator/metrics/hikaricp.connections.active?tag=pool:JoinPool
+
+### ⑬ GeneralPool 활성 커넥션 (maximumPoolSize=60)
+GET {{servicePort}}/actuator/metrics/hikaricp.connections.active?tag=pool:GeneralPool
+
+### ⑭ 전체 HikariCP 대기 커넥션 (pool 고갈 여부 확인)
+GET {{servicePort}}/actuator/metrics/hikaricp.connections.pending

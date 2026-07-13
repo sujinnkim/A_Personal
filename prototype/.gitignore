@@ -1,0 +1,21 @@
+# Gradle
+**/build/
+**/.gradle/
+**/gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+**/.idea/
+**/*.iml
+**/*.iws
+**/*.ipr
+
+# k6 결과 (실측값은 verification/test-history에 기록)
+k6/results/*.json
+
+# 로컬 환경 설정
+*.env.local
+.env
+
+# 로그
+*.log
+logs/

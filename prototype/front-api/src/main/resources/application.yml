@@ -1,0 +1,180 @@
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 300
+      min-spare: 50
+    accept-count: 200
+
+spring:
+  application:
+    name: front-api
+
+  # 자동 DataSource 구성 비활성화 (DataSourceConfig에서 수동 설정)
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=300s
+
+# DataSource 설정
+datasource:
+  join:
+    jdbc-url: jdbc:mariadb://${DB_PRIMARY_HOST:localhost}:${DB_PRIMARY_PORT:3306}/${DB_NAME:meetingdb}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:apppass}
+    driver-class-name: org.mariadb.jdbc.Driver
+    maximum-pool-size: 100
+    minimum-idle: 20
+    connection-timeout: 3000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    pool-name: JoinPool
+
+  service:
+    jdbc-url: jdbc:mariadb://${DB_PRIMARY_HOST:localhost}:${DB_PRIMARY_PORT:3306}/${DB_NAME:meetingdb}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:apppass}
+    driver-class-name: org.mariadb.jdbc.Driver
+    maximum-pool-size: 40
+    minimum-idle: 10
+    connection-timeout: 5000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    pool-name: ServicePool
+
+  general:
+    jdbc-url: jdbc:mariadb://${DB_PRIMARY_HOST:localhost}:${DB_PRIMARY_PORT:3306}/${DB_NAME:meetingdb}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:apppass}
+    driver-class-name: org.mariadb.jdbc.Driver
+    maximum-pool-size: 60
+    minimum-idle: 10
+    connection-timeout: 5000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    pool-name: GeneralPool
+
+  query:
+    jdbc-url: jdbc:mariadb://${DB_REPLICA_HOST:localhost}:${DB_REPLICA_PORT:3307}/${DB_NAME:meetingdb}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:apppass}
+    driver-class-name: org.mariadb.jdbc.Driver
+    maximum-pool-size: 80
+    minimum-idle: 10
+    connection-timeout: 3000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    pool-name: QueryPool
+
+# 외부 서버 Stub URL
+integration:
+  meeting-manager:
+    url: ${MEETING_MANAGER_URL:http://stub-server:8090}
+    timeout: 3000
+  ac-server:
+    url: ${AC_SERVER_URL:http://stub-server:8090}
+    timeout: 3000
+  copilot-admin:
+    url: ${COPILOT_ADMIN_URL:http://stub-server:8090}
+    timeout: 3000
+
+# Resilience4j Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+    instances:
+      meetingManager:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+      acServer:
+        failure-rate-threshold: 60
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+      copilotAdmin:
+        failure-rate-threshold: 70
+        wait-duration-in-open-state: 60s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+  timelimiter:
+    instances:
+      meetingManager:
+        timeout-duration: 3s
+      acServer:
+        timeout-duration: 3s
+      copilotAdmin:
+        timeout-duration: 3s
+
+# Actuator 메트릭 노출
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,caches
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# 입장 전용 Connector (AS-04)
+entry:
+  connector:
+    port: 8081
+    max-threads: 200
+    min-spare-threads: 50
+
+# 스케줄러
+scheduler:
+  pre-warming:
+    cron: "0 * * * * *"  # 1분 주기
+
+# AS-06 스로틀링 (피크 구간 비핵심 API 유입 제한)
+throttling:
+  non-core:
+    rps: 1000                 # 피크 구간 중 비핵심 API 초당 상한
+    retry-after-seconds: 1    # 429 응답 Retry-After 헤더 값
+  peak:
+    evaluate-cron: "30 * * * * *"  # PeakDetector 시간창 평가 주기(1분)
+    morning-start: "08:30"
+    morning-end: "09:30"
+    afternoon-start: "12:30"
+    afternoon-end: "13:30"
+
+logging:
+  level:
+    com.example.frontapi: DEBUG
+    com.zaxxer.hikari: DEBUG

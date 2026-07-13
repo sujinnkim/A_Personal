@@ -1,0 +1,68 @@
+### join.http — 회의 입장 API 테스트 (Port 8081)
+### IV-01: 동시 입장 집중 구간 검증
+### IV-02: join-pool 고갈 시 격리 검증
+###
+### Nginx를 통한 요청 → /meetings/{id}/join, /meetings/{id}/conference-token
+### Nginx가 8081 Connector로 라우팅
+
+@baseUrl = http://localhost
+@entryPort = http://localhost:8081
+@meetingId = 1
+@email = user1@example.com
+
+### ① 회의 입장 (via Nginx → 8081)
+# IV-01 검증: JoinPool 사용 확인
+POST {{baseUrl}}/meetings/{{meetingId}}/join
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### ② 회의 입장 — 직접 8081 포트 (Nginx 우회)
+POST {{entryPort}}/meetings/{{meetingId}}/join
+Content-Type: application/json
+
+{
+  "email": "direct-user@example.com"
+}
+
+### ③ conference-token 발급 (via Nginx → 8081)
+# Meeting Manager Stub에서 토큰 발급 (AS-09 CB 적용)
+GET {{baseUrl}}/meetings/{{meetingId}}/conference-token?email={{email}}
+
+### ④ conference-token 발급 — 직접 8081 포트
+GET {{entryPort}}/meetings/{{meetingId}}/conference-token?email=direct-user@example.com
+
+### ⑤ 중복 입장 시도 (ALREADY_JOINED 반환 확인)
+POST {{baseUrl}}/meetings/{{meetingId}}/join
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### ⑥ 대량 입장 시뮬레이션 — 수동 테스트용 (반복 실행)
+POST {{baseUrl}}/meetings/1/join
+Content-Type: application/json
+
+{"email": "stress-user-001@example.com"}
+
+###
+POST {{baseUrl}}/meetings/1/join
+Content-Type: application/json
+
+{"email": "stress-user-002@example.com"}
+
+###
+POST {{baseUrl}}/meetings/2/join
+Content-Type: application/json
+
+{"email": "stress-user-001@example.com"}
+
+### ⑦ HikariCP JoinPool 활성 커넥션 확인 (입장 요청 후)
+# IV-01: 사용률 80% 이하 = 80개 이하 확인 (maximumPoolSize=100)
+GET http://localhost:8080/actuator/metrics/hikaricp.connections.active?tag=pool:JoinPool
+
+### ⑧ JoinPool 대기 커넥션 확인
+GET http://localhost:8080/actuator/metrics/hikaricp.connections.pending?tag=pool:JoinPool

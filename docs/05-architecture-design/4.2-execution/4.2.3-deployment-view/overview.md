@@ -1,161 +1,102 @@
 # 4.2.3. 배치 뷰 (Deployment View)
 
-배치 뷰는 front-api가 운영 환경에서 어떤 하드웨어·소프트웨어 구성으로 배포되는지를 기술한다. 각 인프라 컴포넌트가 AS 전략과 어떻게 대응되는지를 함께 명시한다.
+배치 뷰는 4.2.1의 런타임 컴포넌트와 4.2.2의 빌드 산출물(front-api)이 운영 환경에서 어떤 하드웨어·소프트웨어 자원에 할당되는지를 결정한다. 각 인프라 컴포넌트가 어느 AS 전략을 실현하는지, 그리고 공유 인프라의 이중화를 함께 기술한다.
 
----
+> **본 절의 범위**: front-api와 그 직접 결합 인프라(Nginx·Tomcat·Redis·MariaDB·커넥션 풀)의 자원 할당에 집중한다. 모니터링·CI/CD 파이프라인은 별도 운영 결정으로 위임하고, Meeting Manager 뒤단 인프라(cPaaS·server-api·WC/VC/AC 서버)는 외부 소유라 경계까지만 표현한다.
 
-## 인프라 토폴로지
+## 배치 결정 원칙
+
+| 원칙 | 근거 | 적용 결과 |
+|---|---|---|
+| **입장 경로의 물리 분리** | AS-04 · QA-02 | Nginx가 `/join`·`/conference-token`을 8081 Connector로 라우팅, 그 외를 8080으로 분리 |
+| **수평 확장 + 로컬 캐시** | AS-03 · QA-01 | front-api 다중 인스턴스, 각 인스턴스에 L1 Caffeine 로컬 배치. L2 Redis는 공유 |
+| **공유 인프라 이중화** | RK-07 · QA-05 | L2 Redis와 MariaDB Replica를 이중화해 단일 장애점 완화 (4.2.3.3) |
+| **커넥션 총량 상한** | RK-01 · CR-02 | 기능별 풀 크기 합을 DB 최대 커넥션 이내로 설계, 인스턴스 수 증가 시 확대 경로 명시 |
+| **읽기·쓰기 물리 분리** | AS-07 | Primary는 Write, Replica는 Read 전담. readOnly 트랜잭션으로 라우팅 |
+
+## 종합 배치도
 
 ```mermaid
-flowchart TD
-    CLIENT["클라이언트\n(미팅 웹포탈 · 모바일 앱)"]
+flowchart TB
+    WEB(["미팅 웹 · PC 클라이언트"])
 
-    subgraph INFRA["운영 인프라"]
-        direction TB
+    subgraph GCP["GCP Region"]
+        LB["Cloud HTTPS LB + Cloud Armor"]
+        PSC["Private Service Connect / Cloud VPN"]
 
-        L4["L4 Load Balancer\n(IP Hash 또는 Round Robin)"]
-
-        subgraph NGINX_TIER["Nginx 계층  — AS-04 URL 패턴 라우팅"]
-            NGINX["Nginx\n/join · /conference-token → 8081\n그 외 → 8080"]
-        end
-
-        subgraph APP_TIER["front-api (Spring Boot + Tomcat)  — 수평 확장 인스턴스"]
-            direction LR
-            C8081["Tomcat Connector\nport 8081\n입장 전용  AS-04\nmaxThreads=200\nminSpareThreads=50"]
-            C8080["Tomcat Connector\nport 8080\n일반  AS-04\nmaxThreads=300"]
-
-            subgraph FILTER["AS-05 ThrottlingFilter"]
-                TF["ThrottlingInterceptor\n(port 8080 경로만 적용)"]
+        subgraph GKE["GKE 클러스터"]
+            NGINX["Nginx Ingress · 8081/8080 (AS-04)"]
+            subgraph FADEP["front-api Deployment (Pod × 3, HPA)"]
+                subgraph POD1["Pod #1"]
+                    direction LR
+                    DE["entry"]
+                    DA["auth"]
+                    DM["meeting"]
+                end
+                POD2["Pod #2 (동일 구성)"]
+                POD3["Pod #3 (동일 구성)"]
             end
-
-            subgraph DOMAIN_LAYER["domain.*  AS-01"]
-                DE["domain.entry"]
-                DA["domain.auth"]
-                DM["domain.meeting"]
+            subgraph SAPI["server-api (Pod × 2)"]
+                SA1["Pod #1"]
+                SA2["Pod #2"]
             end
-
-            subgraph INTEGRATION_LAYER["integration.*"]
-                MM_INT["integration.meetingManager\nAS-09 CB"]
-                AC_INT["integration.ac\nAS-09 CB"]
-                CP_INT["integration.copilot\nAS-09 CB"]
-            end
-
-            ASYNC["externalCallExecutor\nAS-02 @Async\ncorePoolSize=100 · maxPoolSize=500"]
-
-            SCH["PreWarmingScheduler\nAS-06\n(front-api 내장, 1분 주기)"]
+            AAPI["admin-api (Pod × 1)"]
         end
 
-        subgraph CACHE_TIER["캐시 계층  AS-03"]
-            direction LR
-            L1_C["L1 Caffeine\n인스턴스 로컬\nTTL 5분"]
-            REDIS["Redis\nL2 분산 공유\nTTL 30분~1시간"]
+        subgraph REDISN["Cloud Memorystore for Redis (HA)"]
+            RM[("Master")]
+            RR[("Replica")]
+            RM -.->|복제| RR
         end
-
-        subgraph POOL_TIER["HikariCP Bulkhead  AS-08"]
-            direction LR
-            JP["join-pool\n100 conn  AS-08"]
-            SP["service-pool\n40 conn  AS-08"]
-            GP["general-pool\n60 conn  AS-08"]
-            QP["query-pool\n80 conn  AS-07 AS-08"]
-        end
-
-        subgraph DB_TIER["MariaDB  AS-07 CQRS"]
-            direction LR
-            PRI["Primary\nWrite 전담"]
-            REP["Replica\nRead 전담"]
+        subgraph SQLN["Cloud SQL for MariaDB"]
+            PRI[("Primary · Write<br/>zone-a")]
+            STB[("Standby · Failover<br/>zone-b (HA)")]
+            REP1[("Read Replica 1")]
+            REP2[("Read Replica 2")]
+            PRI -.->|"동기 복제 · 자동 failover"| STB
+            PRI -.->|비동기 복제| REP1
+            PRI -.->|비동기 복제| REP2
         end
     end
 
-    subgraph EXT_TIER["외부 서버 (외부 의존)"]
-        direction LR
+    subgraph EXTN["외부 서버 (외부 소유)"]
         MM["Meeting Manager"]
         ACS["AC서버"]
         CPS["Copilot Admin"]
     end
 
-    %% 요청 흐름
-    CLIENT --> L4
-    L4 --> NGINX
-    NGINX -->|"/join · /conference-token\nport 8081"| C8081
-    NGINX -->|"그 외 API\nport 8080"| C8080
-    C8080 --> TF
-    TF --> DA & DM
-    C8081 --> DE
+    WEB -->|HTTPS| LB --> NGINX
+    NGINX --> POD1
+    POD1 -->|"Redis 프로토콜"| RM
+    POD1 -->|"JDBC · Write 풀"| PRI
+    POD1 -->|"JDBC · Read 풀"| REP1
+    POD1 -.->|"RestTemplate · CB"| PSC
+    SA1 --> PRI
+    PSC -.-> MM & ACS & CPS
 
-    %% domain → integration
-    DE --> MM_INT
-    DM --> AC_INT
-    DA --> AC_INT & CP_INT
-
-    %% async
-    MM_INT & AC_INT & CP_INT --> ASYNC
-    ASYNC --> MM & ACS & CPS
-
-    %% 캐시
-    DA --> L1_C
-    L1_C -->|miss| REDIS
-    SCH --> REDIS
-
-    %% 커넥션 풀
-    DE --> JP
-    DM --> SP
-    DA --> GP
-    DM -->|readOnly| QP
-
-    %% DB
-    JP & SP & GP --> PRI
-    QP --> REP
-
-    style C8081 fill:#d4edda,color:#000
-    style JP fill:#d4edda,color:#000
-    style REDIS fill:#cce5ff,color:#000
+    classDef edge fill:#e8f0ff,color:#000,stroke:#3b6cb5
+    classDef app fill:#e3f3e3,color:#000,stroke:#27ae60
+    classDef mod fill:#f0fff0,color:#000,stroke:#27ae60
+    classDef cache fill:#eef7f0,color:#000,stroke:#27ae60
+    classDef data fill:#f5f5f5,color:#000,stroke:#566573
+    classDef ext fill:#ffffff,color:#000,stroke:#999,stroke-dasharray:4 4
+    class LB,NGINX,PSC edge
+    class POD2,POD3,SA1,SA2,AAPI app
+    class DE,DA,DM mod
+    class RM,RR cache
+    class PRI,STB,REP1,REP2 data
+    class MM,ACS,CPS ext
 ```
 
----
+## 컴포넌트별 할당 요약
 
-## 컴포넌트별 설정 요약
+| 컴포넌트 | 배치 | 이중화 | 관련 AS |
+|---|---|---|---|
+| Nginx | front-api 앞단 (또는 인스턴스 사이드카) | LB 하위 다중 | AS-04 |
+| front-api (Tomcat) | 수평 확장 인스턴스 N대 | LB 분산 | AS-01·02·04 |
+| L1 Caffeine | 각 인스턴스 로컬 (JVM 내) | 인스턴스별 독립 | AS-03 |
+| L2 Redis | 공유 캐시 노드 | Sentinel/Cluster HA | AS-03 |
+| MariaDB Primary | Write 전담 노드 | Replica 승격 경로 | AS-07 |
+| MariaDB Replica | Read 전담 노드 | 다중 Replica | AS-07 |
 
-### Nginx 라우팅 설정
-
-| 패턴 | 라우팅 대상 | 비고 |
-|-----|-----------|------|
-| `/meetings/*/join` | front-api:8081 | AS-04: 입장 전용 Connector |
-| `/meetings/*/conference-token` | front-api:8081 | AS-04: 입장 전용 Connector |
-| 그 외 모든 경로 | front-api:8080 | AS-04: 일반 Connector |
-
-### Tomcat Connector 설정 (AS-04)
-
-| Connector | 포트 | maxThreads | minSpareThreads | 용도 |
-|---------|-----|-----------|----------------|------|
-| 입장 전용 | 8081 | 200 | 50 | /join, /conference-token 전용 |
-| 일반 | 8080 | 300 | 기본값 | 조회·권한 갱신·관리 |
-
-### AsyncTaskExecutor 설정 (AS-02)
-
-| Bean | corePoolSize | maxPoolSize | queueCapacity | 용도 |
-|-----|------------|------------|--------------|------|
-| `externalCallExecutor` | 100 | 500 | 2,000 | 외부 서버 Feign 호출 전담 |
-| `preWarmExecutor` | 10 | 50 | 1,000 | Pre-warming 전담 (저우선순위) |
-
-### HikariCP 커넥션 풀 구성 (AS-08)
-
-| 풀 이름 | 대상 DataSource | maximumPoolSize | connectionTimeout | 용도 |
-|--------|--------------|----------------|-----------------|------|
-| join-pool | joinDataSource (Primary) | 100 | 3,000ms | 입장 처리 전용 |
-| service-pool | serviceDataSource (Primary) | 40 | 5,000ms | 회의 시작·초대 |
-| general-pool | generalDataSource (Primary) | 60 | 5,000ms | 권한 갱신·일반 조회 |
-| query-pool | queryDataSource (Replica) | 80 | 3,000ms | Read 전용 (AS-07 CQRS) |
-
-### 캐시 계층 구성 (AS-03)
-
-| 계층 | 구현체 | TTL | 범위 | 비고 |
-|-----|------|-----|-----|------|
-| L1 | Caffeine | 5분 | 인스턴스 로컬 | front-api 인스턴스마다 독립 |
-| L2 | Redis | AC 권한 1시간 / LLM·용어사전 권한 30분 | 분산 공유 | 다중 인스턴스 간 공유 |
-
-### MariaDB 구성 (AS-07)
-
-| 노드 | 역할 | 라우팅 조건 | 연결 풀 |
-|-----|-----|-----------|--------|
-| Primary | Write 전담 | `@Transactional(readOnly=false)` | join-pool · service-pool · general-pool |
-| Replica | Read 전담 | `@Transactional(readOnly=true)` | query-pool |
+각 계층의 상세 설정은 하위 절에서 다룬다: [4.2.3.1 네트워크·엣지](4.2.3.1-network-edge.md), [4.2.3.2 애플리케이션](4.2.3.2-app.md), [4.2.3.3 데이터](4.2.3.3-data.md), [4.2.3.4 외부 연계](4.2.3.4-external.md).

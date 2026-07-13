@@ -1,0 +1,54 @@
+### auth.http — 사용자 권한 갱신 API 테스트 (Port 8080)
+### IV-03: 캐시 hit율 90% 이상 + 응답시간 1초 이내
+
+@baseUrl = http://localhost
+@generalPort = http://localhost:8080
+@email = user1@example.com
+
+### ① 권한 갱신 (detail 조회) — L1 캐시 miss (최초 요청)
+# GeneralPool 사용, AC서버/Copilot Stub 연동
+GET {{baseUrl}}/members/{{email}}?type=detail
+
+### ② 권한 갱신 — L1 캐시 hit (두 번째 요청, 빠름)
+# 응답시간이 ①보다 현저히 빠르면 캐시 hit 확인됨
+GET {{baseUrl}}/members/{{email}}?type=detail
+
+### ③ 다른 사용자 권한 조회 (Pre-warming 선적재 대상)
+GET {{baseUrl}}/members/user100@example.com?type=detail
+
+### ④ 관리자 권한 조회
+GET {{baseUrl}}/members/organizer1@example.com?type=detail
+
+### ⑤ basic 조회 (캐시 미적용)
+GET {{baseUrl}}/members/{{email}}?type=basic
+
+### ─── Actuator 캐시 메트릭 ───────────────────────────────────
+
+### ⑥ 캐시 hit 수 조회 — member-permissions (L1 Caffeine)
+# IV-03 핵심: hit/(hit+miss) ≥ 90%
+GET {{generalPort}}/actuator/metrics/cache.gets?tag=name:member-permissions&tag=result:hit
+
+### ⑦ 캐시 miss 수 조회 — member-permissions
+GET {{generalPort}}/actuator/metrics/cache.gets?tag=name:member-permissions&tag=result:miss
+
+### ⑧ 전체 캐시 목록 조회
+GET {{generalPort}}/actuator/caches
+
+### ⑨ HikariCP GeneralPool 활성 커넥션
+# IV-01/III: GeneralPool(maximumPoolSize=60) 사용률 확인
+GET {{generalPort}}/actuator/metrics/hikaricp.connections.active?tag=pool:GeneralPool
+
+### ⑩ HikariCP 전체 풀 요약
+GET {{generalPort}}/actuator/metrics/hikaricp.connections.active
+
+### ⑪ 전체 메트릭 목록 (hikaricp 필터)
+GET {{generalPort}}/actuator/metrics
+
+### ⑫ 헬스체크
+GET {{generalPort}}/actuator/health
+
+### ─── Pre-warming Scheduler 확인 ────────────────────────────
+
+### ⑬ Prometheus 메트릭에서 캐시 hit율 원시 데이터 확인
+# prometheus 프로파일 실행 시: http://localhost:9090
+GET {{generalPort}}/actuator/prometheus

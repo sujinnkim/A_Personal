@@ -12,9 +12,9 @@
 | 환경 | 대상 |
 |---|---|
 | Knox | 사내 임직원 |
-| Brity 대외 | B2C — Brity Works에 가입한 외부 기업 임직원 |
-| Brity 공공 (행망) | 공공기관 — 행정망 |
-| Brity 공공 (공망) | 공공기관 — 공공망 |
+| Brity 대외 | B2C: Brity Works에 가입한 외부 기업 임직원 |
+| Brity 공공 (행망) | 공공기관: 행정망 |
+| Brity 공공 (공망) | 공공기관: 공공망 |
 
 환경별 요구사항이 점점 달라지면서 비즈니스 로직 내부에 환경별 분기 처리가 누적되고 있으며, 환경별 릴리즈 일정도 상이하여 단일 형상 관리의 복잡도가 증가하고 있다.
 
@@ -150,7 +150,7 @@ cPaaS → server-api → DB update
 
 - **입장 가능 회의 상태**: 예약 상태(scheduled) 또는 진행 중(in-progress) 모두 입장 가능하다.
 - **입장 처리 순서**:
-  1. DB에서 입장 가능 여부 확인 — 초대 참석자 여부 또는 오픈 회의 여부 확인.
+  1. DB에서 입장 가능 여부 확인(초대 참석자 여부 또는 오픈 회의 여부 확인).
   2. 오픈회의 셀프 참석의 경우 front-api가 participants 테이블에 INSERT (초대 참석자는 이미 레코드 존재, write 없음).
   3. `/conference-token` API로 인미팅 전용 토큰 발급.
   4. Meeting Manager에 Feign 동기 호출(read timeout 3,000ms)로 참석자 입장 관련 정보 조회 → front-api에서 MM 응답값과 다른 값들을 조합하여 wyzProParam 생성 → front-api가 웹/모바일에 반환 → 런처를 통해 클라이언트 실행 시 wyzProParam 전달.
