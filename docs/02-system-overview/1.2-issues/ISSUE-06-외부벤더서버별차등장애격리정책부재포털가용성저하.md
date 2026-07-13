@@ -2,7 +2,7 @@
 
 ## 현황
 
-포털 서버는 WC서버, VC서버, AC서버, AI서버, Copilot Admin 서버 등 다수의 외부 서버와 Feign(동기, read timeout 3,000ms) HTTP 호출로 연동한다. Feign에는 Hystrix 기반 서킷 브레이커가 적용되어 있으며 서버별 개별 설정이 가능하다. 그러나 WC서버(회의 개설·종료 필수, 빠른 감지 필요)·Copilot Admin 서버(DB 폴백 가능, 관대한 임계값 허용)·AC서버(선택적 연계)처럼 서버마다 장애 허용 범위와 복구 전략이 다름에도 중요도에 따른 차등 임계값·폴백 전략이 충분히 반영되지 않은 상태다. 또한 Hystrix는 Netflix가 유지보수 중단을 선언한 이후 Spring Cloud에서도 공식 지원이 종료되어, Spring Boot 3.x 환경에서 장기적으로 신뢰할 수 없는 상태다.
+포털 서버는 WC서버, VC서버, AC서버, AI서버, Copilot Admin 서버 등 다수의 외부 서버와 Feign(동기, read timeout 3,000ms) HTTP 호출로 연동한다. Feign에는 Hystrix 기반 Circuit Breaker가 적용되어 있으며 서버별 개별 설정이 가능하다. 그러나 WC서버(회의 개설·종료 필수, 빠른 감지 필요)·Copilot Admin 서버(DB Fallback 가능, 관대한 임계값 허용)·AC서버(선택적 연계)처럼 서버마다 장애 허용 범위와 복구 전략이 다름에도 중요도에 따른 차등 임계값·Fallback 전략이 충분히 반영되지 않은 상태다. 또한 Hystrix는 Netflix가 유지보수 중단을 선언한 이후 Spring Cloud에서도 공식 지원이 종료되어, Spring Boot 3.x 환경에서 장기적으로 신뢰할 수 없는 상태다.
 
 이는 사용자 요청 경로(front-api → Meeting Manager → server-api)뿐 아니라 피드백 흐름(cPaaS → server-api)에도 동일하게 적용된다.
 

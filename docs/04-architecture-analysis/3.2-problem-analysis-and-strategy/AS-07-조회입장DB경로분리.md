@@ -157,4 +157,4 @@ flowchart TD
 
 - **R1. 복제 지연 read-after-write 불일치:** 입장 직후 재조회가 필요한 경로는 `readOnly=false`로 Primary에서 읽고, 강한 정합성이 필요 없는 조회만 Replica로 분산
 - **R2. readOnly 경계 누락 시 Primary 회귀:** Query 메서드 readOnly 지정을 규칙화하고 리뷰로 검증
-- **R3. Replica 장애 시 read 경로 전체 영향:** 헬스체크 기반 Primary 폴백 라우팅 구성
+- **R3. Replica 장애 시 read 경로 전체 영향:** 헬스체크 기반 Primary Fallback 라우팅 구성

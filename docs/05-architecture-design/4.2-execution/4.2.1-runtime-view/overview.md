@@ -14,7 +14,7 @@
 | [4.2.1.2 회의 입장](4.2.1.2-join.md) | UC-04 피크 집중 입장 | AS-04 · AS-02 · AS-08 |
 | [4.2.1.3 권한 갱신](4.2.1.3-auth.md) | UC-01 캐시 hit/miss | AS-03 · AS-02 · AS-09 |
 | [4.2.1.4 선제 적재](4.2.1.4-prewarming.md) | AS-05 Pre-warming | AS-05 · AS-06 · AS-03 |
-| [4.2.1.5 격벽 격리](4.2.1.5-bulkhead.md) | AS-08 Bulkhead | AS-08 · AS-01 |
+| [4.2.1.5 Bulkhead 격리](4.2.1.5-bulkhead.md) | AS-08 Bulkhead | AS-08 · AS-01 |
 | [4.2.1.6 장애 차단](4.2.1.6-resilience.md) | AS-09 Circuit Breaker | AS-09 · AS-03 |
 
 상세 모듈 패키지 구조는 [4.2.2 모듈 뷰](../4.2.2-module-view/overview.md), 컴포넌트의 물리 배치는 [4.2.3 배치 뷰](../4.2.3-deployment-view/overview.md)에서 다룬다.
