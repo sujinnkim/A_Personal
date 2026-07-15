@@ -22,8 +22,8 @@
 | AS-09 Resilience4j CB 차등 | 구현 | 3개 어댑터 `@CircuitBreaker`+인라인 fallback, `application.yml` 인스턴스별 임계 |
 
 기타 정적 검토 메모:
-- Feign 잔재 없음. `WebClientConfig`는 이름과 달리 RestTemplate 빈 생성(모듈뷰 4.2.2.5도 RestTemplate로 확정, 명칭만 오해 소지).
-- resilience4j `timelimiter`는 동기 RestTemplate에선 무효(실제 타임아웃은 RestTemplate 3s).
+- AS-09 외부 호출은 Feign으로 구현(2026-07-15 RestTemplate→Feign 전환, C-01 스택 유지). 각 `integration.*`에 `@FeignClient`(MeetingManagerClient·AcServerClient·CopilotClient), Adapter가 위임 + `@CircuitBreaker`·fallback. `WebClientConfig` 제거, `@EnableFeignClients`(앱) + `feign.client.config`(yml). build.gradle에 spring-cloud-starter-openfeign(BOM 2023.0.3). 컴파일 미검증.
+- resilience4j `timelimiter`는 동기 Feign 호출에선 무효(실제 타임아웃은 `feign.client.config` read 3s).
 - 자동화 테스트: `FrontApiApplicationTest.contextLoads`(인프라 필요) + `DomainBoundaryArchTest`(ArchUnit, 인프라 불필요, 미실행).
 
 ## 3. 검증 환경 상태

@@ -7,6 +7,10 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+ext {
+    set('springCloudVersion', '2023.0.3')
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -15,6 +19,12 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
@@ -27,6 +37,9 @@ dependencies {
 
     // Caffeine L1 캐시
     implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // Feign — AS-09 외부 서버 동기 호출 (C-01 기술 스택 유지)
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // Resilience4j Circuit Breaker
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'

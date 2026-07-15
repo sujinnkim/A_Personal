@@ -86,13 +86,24 @@ datasource:
 integration:
   meeting-manager:
     url: ${MEETING_MANAGER_URL:http://stub-server:8090}
-    timeout: 3000
   ac-server:
     url: ${AC_SERVER_URL:http://stub-server:8090}
-    timeout: 3000
   copilot-admin:
     url: ${COPILOT_ADMIN_URL:http://stub-server:8090}
-    timeout: 3000
+
+# Feign — AS-09 외부 서버 동기 호출 timeout (서버별 connect/read 3,000ms)
+feign:
+  client:
+    config:
+      meetingManager:
+        connectTimeout: 3000
+        readTimeout: 3000
+      acServer:
+        connectTimeout: 3000
+        readTimeout: 3000
+      copilotAdmin:
+        connectTimeout: 3000
+        readTimeout: 3000
 
 # Resilience4j Circuit Breaker
 resilience4j:

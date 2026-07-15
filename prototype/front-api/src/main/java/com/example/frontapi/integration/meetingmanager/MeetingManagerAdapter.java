@@ -2,16 +2,13 @@ package com.example.frontapi.integration.meetingmanager;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
 /**
- * AS-09: Meeting Manager 연동 어댑터
+ * AS-09: Meeting Manager 연동 어댑터 (Feign + Resilience4j)
+ * - 외부 호출: MeetingManagerClient(@FeignClient, 동기)
  * - Circuit Breaker: failureRate=50%, wait=10s
  * - Fallback: fail-fast 오류 반환 (null / false)
  */
@@ -19,22 +16,16 @@ import java.util.Map;
 @Component
 public class MeetingManagerAdapter implements MeetingManagerGateway {
 
-    private final RestTemplate restTemplate;
-    private final String baseUrl;
+    private final MeetingManagerClient client;
 
-    public MeetingManagerAdapter(
-        @Qualifier("meetingManagerRestTemplate") RestTemplate restTemplate,
-        @Value("${integration.meeting-manager.url}") String baseUrl
-    ) {
-        this.restTemplate = restTemplate;
-        this.baseUrl = baseUrl;
+    public MeetingManagerAdapter(MeetingManagerClient client) {
+        this.client = client;
     }
 
     @Override
     @CircuitBreaker(name = "meetingManager", fallbackMethod = "notifyFallback")
     public boolean notifyMeetingStarted(Long meetingId) {
-        String url = baseUrl + "/stub/meeting-manager/meetings/" + meetingId + "/start";
-        restTemplate.postForObject(url, Map.of("meetingId", meetingId), Void.class);
+        client.notifyMeetingStarted(meetingId, Map.of("meetingId", meetingId));
         log.debug("[MeetingManager] 회의 시작 알림 성공 meetingId={}", meetingId);
         return true;
     }
@@ -42,9 +33,7 @@ public class MeetingManagerAdapter implements MeetingManagerGateway {
     @Override
     @CircuitBreaker(name = "meetingManager", fallbackMethod = "tokenFallback")
     public String issueConferenceToken(Long meetingId, String email) {
-        String url = baseUrl + "/stub/meeting-manager/conference-token?meetingId=" + meetingId + "&email=" + email;
-        @SuppressWarnings("unchecked")
-        Map<String, String> response = restTemplate.getForObject(url, Map.class);
+        Map<String, String> response = client.issueConferenceToken(meetingId, email);
         if (response != null) {
             return response.get("token");
         }
