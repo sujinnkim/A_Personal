@@ -57,3 +57,8 @@
 | report/4/4.2.2-모듈뷰/4.2.2.5-config-scheduler.md | 4.2.2-class-config.png | 4.2.2-class-config.drawio |
 | report/4/4.2.3-배치뷰.md | 4.2-deployment-topology.png | 4.2-deployment-topology.drawio |
 | report/4/4.2.3-배치뷰.md | 4.2-deployment-external.png | 4.2-deployment-external.drawio |
+| report/5/5.3-검증결과.md | 5.3-iv01-pool.png | (Grafana 캡처) |
+| report/5/5.3-검증결과.md | 5.3-iv02-isolation.png | (Grafana 캡처) |
+| report/5/5.3-검증결과.md | 5.3-iv03-cache.png | (Grafana 캡처) |
+| report/5/5.3-검증결과.md | 5.3-iv04-cb.png | (Grafana 캡처) |
+| report/5/5.3-검증결과.md | 5.3-iv05-cqrs.png | (Grafana 캡처) |
